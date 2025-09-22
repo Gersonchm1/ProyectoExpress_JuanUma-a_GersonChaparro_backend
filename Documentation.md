@@ -355,7 +355,7 @@ erDiagram
         string nombre
         string correo
         string contraseña
-        string datos
+        string tipo
     }
 
     Pelicula {
@@ -373,6 +373,7 @@ erDiagram
         string id_resena
         string comentario
         int likes
+        int dislikes 
         date fecha
         string usuario_resena
         string titulo
@@ -424,9 +425,9 @@ Aqui se realizó lo ya establecido en el modelo conceptual inicial, sin embargo 
 
 ### correo
 
-### contraseña
+### tipo 
 
-### datos
+### contraseña
 
 ## Película
 
@@ -498,7 +499,7 @@ erDiagram
         string nombre
         string correo
         string contraseña
-        string datos
+        string tipo
     }
 
     Pelicula {
@@ -521,6 +522,7 @@ erDiagram
         string id_resena
         string comentario
         int likes
+        int dislikes
         date fecha
         string titulo
         string id_usuario
@@ -577,7 +579,7 @@ erDiagram
         string nombre
         string correo
         string contraseña
-        string datos
+        strng tipo
     }
 
     Pelicula {
@@ -662,7 +664,7 @@ erDiagram
         string nombre
         string correo
         string contraseña
-        string datos
+        string tipo
     }
 
     Pelicula {
@@ -685,6 +687,7 @@ erDiagram
         string id_resena
         string comentario
         int likes
+        int dislikes
         date fecha
         string titulo
         string id_usuario
