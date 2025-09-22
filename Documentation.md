@@ -284,9 +284,9 @@ En conjunto, este documento busca ofrecer una visión integral, lógica y compre
 
 # Objetivos 
 
-Se planea desarrollar una api que contenga la logica del negocio desarrollada correctamente y la información necesaria para que pueda ser extraida correctamente del front-end, con 
+Se planea desarrollar una api que contenga la logica del negocio desarrollada correctamente y la información necesaria para que pueda ser extraida correctamente del front-end, con su respectivo jwt, por otro lado tener un front-end fluido y con buen diseño el cual cumpla con lo que se nos pide en el caso de estudio.
 
-#### 1.Realizar un buen planteamiento
+#### 1.Realizar un buen planteamiento de la base de datos
 
 #### 2. Establecer el modelo e-r para la base de datos 
 
@@ -295,6 +295,10 @@ Se planea desarrollar una api que contenga la logica del negocio desarrollada co
 #### 4. Finalizar la documentación de la base de datos
 
 #### 5. Que la base de datos se pueda integrar correctamente al proyecto
+
+### 6. Poder desarrollar la logica de negocio de la mejor manera posible en el backend
+
+### 7. Poder extraer la informacion correctamente en el front-end y cumplir con el diseño deseado 
 
 
 
@@ -340,82 +344,53 @@ Además, el modelo conceptual actúa como un puente entre los requerimientos del
 
 ### Descripción Técnica
 
-Aqui se buscó el inicio del palanteamiento de la estructura que se busca en la plataforma de freelance, creando las entidades principales como: usuario, freelancer, cliente , proyecto, contrato, propuesta, etc, Con sus respectivos atributos 
+Aqui se buscó el inicio del palanteamiento de la estructura que se busca en la cual exista un usuario elcual tenga un tipo ya sea usuario corriente o administrador, exista una coleccion de peliculas , la cual conntenga la data a extraer, la coleccion de comentarios y una calificacion.
 
 
 ## Grafica
 ``` mermaid
 erDiagram
-    Freelancer {
-        int id_freelancer
+    Usuario {
+        string id_usuario
         string nombre
         string correo
-        string telefono
-        string experiencia
-        string tecnologias
-        string areas
-        int cantProyectosRealizados
-        float tarifaH
-        int numPropuestas
+        string contraseña
+        string datos
+    }
+
+    Pelicula {
+        string id_pelicula
+        string titulo
+        int año
+        string director
         string descripcion
+        string duracion
+        string genero
+        int vistas
     }
 
-    Cliente {
-        int id_cliente
-        string Nombre
-        string Correo
-        string Categoria
-        int numProyectosPublicados
-        string telefono
+    Reseña {
+        string id_resena
+        string comentario
+        int likes
+        date fecha
+        string usuario_resena
+        string titulo
     }
 
-    Usuario {
-        int usuario_id
-        string tipo
-    }
-
-    Proyecto {
-        int id_proyecto
-        string Nombre
-        string Descripcion
-        float Budget
-        string Estado
-        string Entregables
-        string Tasks
-    }
-
-    Propuesta {
-        int id_propuesta
-        string descripcion
-        string estado
-        string Tecnologias
-        float Precios
-        string Plazo
-    }
-
-    Contrato {
-        int id_contrato
-        string Titulo
-        string condiciones
-        string Estado
-        string Tecnologias
-        string Descripcion
-        string Nombre
-        float Valor_total
-        date fecha_inicio
-        date fecha_fin
+    Calificacion {
+        string id_calificacion
+        int rating
+        string critico
+        int calificador
     }
 
     %% Relaciones
-    Usuario ||--o{ Cliente : tiene
-    Usuario ||--o{ Freelancer : tiene
+    Usuario ||--o{ Reseña : "escribe"
+    Usuario ||--o{ Calificacion : "realiza"
+    Pelicula ||--o{ Reseña : "tiene"
+    Pelicula ||--o{ Calificacion : "recibe"
 
-    Cliente ||--o{ Proyecto : publica
-    Freelancer ||--o{ Propuesta : envia
-    Proyecto ||--o{ Propuesta : recibe
-    Proyecto ||--o{ Contrato : genera
-    Freelancer ||--o{ Contrato : participa
-    Cliente ||--o{ Contrato : firma
 
 ```
 
@@ -441,101 +416,66 @@ Aqui se realizó lo ya establecido en el modelo conceptual inicial, sin embargo 
 
 ## Entidades Antes de la normalización
 
-### Freelancer
+## Usuario
 
-- id_freelancer
+### id_usuario (PK)
 
-- nombre
+### nombre
 
-- correo
+### correo
 
-- telefono
+### contraseña
 
-- experiencia
+### datos
 
-- tecnologias
+## Película
 
-- areas
+### id_pelicula (PK)
 
-- antProyectosRealizados
+### titulo
 
-- tarifaH
+### año
 
-- numPropuestas
+### director
 
-- descripcion
+### descripcion
 
-### Cliente
+### duracion
 
-- id_cliente
+### genero
 
-- Nombre
+### vistas
 
-- Correo
 
-- Categoria
+## Reseña
 
-- numProyectosPublicados
+### id_resena (PK)
 
-- telefono
+### comentario
 
-- Usuario
+### likes
 
-- usuario_id
+### fecha
 
-- tipo
+### titulo
 
-### Proyecto
+### id_usuario (FK )
 
-- id_proyecto
+### id_pelicula (FK)
 
-- Nombre
+## Calificación
 
-- Descripcion
+### id_calificacion (PK)
 
-- Budget
+### rating
 
-- Estado
+### critico
 
-- Entregables
+### calificador
 
-- Tasks
+### id_usuario (FK)
 
-### Propuesta
-
-- id_propuesta
-
-- descripcion
-
-- estado
-
-- Tecnologias
-
-- Precios
-
-- Plazo
-
-### Contrato
-
-- id_contrato
-
-- Titulo
-
-- condiciones
-
-- Estado
-
-- Tecnologias
-
-- Descripcion
-
-- Nombre
-
-- Valor total
-
-- fecha inicio
-
-- fecha fin
+### id_pelicula (FK)
 
 # Normalización del Modelo Lógico
 
@@ -553,86 +493,57 @@ La Primera Forma Normal (1FN) es el proceso de normalización de bases de datos,
 
 ``` mermaid
 erDiagram
-    Proyecto {
-        int budget
-        string descripcion
-        string estado
-        string nombre
-        string tecnologias
-        string id_cliente FK
-        string id_usuario FK
-        string id_proyecto PK
-    }
-
-    Cliente {
-        string nombre
-        string correo
-        string telefono
-        string categoria
-        int numProyectosPublicados
-        string id_cliente PK
-        string id_usuario FK
-        string id_propuesta FK
-    }
-
-    Propuesta {
-        string plazo
-        string descripcion
-        string tecnologias
-        string estado
-        string id_propuesta PK
-        string id_freelancer FK
-        string id_proyecto FK
-    }
-
-    Entregable {
-        string tarea PK
-        string descripcion
-        float precioBudget
-        string id_proyecto PK, FK
-    }
-
     Usuario {
-        string tipo
-        string id_cliente FK
-        string id_freelancer FK
-        string id_usuario PK
-    }
-
-    Contrato {
-        string condiciones
-        string estado
-        date fechaInicio
-        date fechaFin
-        string titulo
-        float valorTotal
-        string id_contrato PK
-        string id_freelancer FK
-        string id_cliente FK
-    }
-
-    Freelancer {
-        string experiencia
-        string tecnologias
-        string areas
-        float tarifaH
-        string descripcion
-        int cantProyectosRealizados
+        string id_usuario
         string nombre
         string correo
-        string telefono
-        int numPropuestas
-        string id_freelancer PK
+        string contraseña
+        string datos
     }
 
-    Cliente ||--o{ Proyecto : ""
-    Cliente ||--o{ Contrato : ""
-    Cliente ||--o{ Usuario : ""
-    Proyecto ||--o{ Propuesta : ""
-    Proyecto ||--o{ Entregable : ""
-    Freelancer ||--o{ Propuesta : ""
-    Freelancer ||--o{ Contrato : ""
-    Freelancer ||--o{ Usuario : ""
+    Pelicula {
+        string id_pelicula
+        string titulo
+        int año
+        string director
+        string descripcion
+        string duracion
+        int vistas
+        string id_genero
+    }
+
+    Genero {
+        string id_genero
+        string nombre
+    }
+
+    Reseña {
+        string id_resena
+        string comentario
+        int likes
+        date fecha
+        string titulo
+        string id_usuario
+        string id_pelicula
+    }
+
+    Calificacion {
+        string id_calificacion
+        int rating
+        string critico
+        int calificador
+        string id_usuario
+        string id_pelicula
+    }
+
+    %% Relaciones principales
+    Usuario ||--o{ Reseña : escribe
+    Usuario ||--o{ Calificacion : realiza
+    Pelicula ||--o{ Reseña : tiene
+    Pelicula ||--o{ Calificacion : recibe
+
+    %% Relación con Genero
+    Genero ||--o{ Pelicula : clasifica
 
 
 ``` 
@@ -643,15 +554,7 @@ Para cumplir con la primera forma de normalización se eliminaron repeticiones d
 
 #### Cambios hechos:
 
-- Se añadieron nuevos atributos como plazo a proyectos
-
-
-- Se cambiaron algunos atributos multivaluados
-
-- Entregables se uelve unsa tabla y tareas uno de sus atributos
-
-- se hace el esquema e referencias con llaves foráneas , sin  embargo en mongodb fiunciona diferente
-
+- Se separo la parte de genero en la tabla de peliculas
 
 
 <br>
@@ -669,90 +572,58 @@ En bases de datos relacionales es un paso en el proceso de normalización que bu
 ### Gafica
 ``` mermaid
 erDiagram
-    Proyecto {
-        int budget
-        string descripcion
-        string estado
-        string nombre
-        string tecnologias
-        string id_cliente FK
-        string id_usuario FK
-        string id_proyecto PK
-    }
-
-    Cliente {
-        string nombre
-        string correo
-        string telefono
-        string categoria
-        int numProyectosPublicados
-        string id_cliente PK
-        string id_usuario FK
-    }
-
-    Propuesta {
-        string plazo
-        string descripcion
-        string tecnologias
-        string estado
-        string id_propuesta PK
-        string id_freelancer FK
-        string id_proyecto FK
-        string id_usuario FK
-    }
-
-    Entregable {
-        string tarea PK
-        string descripcion
-        float precioBudget
-        string id_proyecto PK, FK
-    }
-
     Usuario {
-        string tipo
-        string id_cliente FK
-        string id_freelancer FK
-        string id_usuario PK
-    }
-
-    Contrato {
-        string condiciones
-        string estado
-        date fechaInicio
-        date fechaFin
-        string titulo
-        float valorTotal
-        string id_contrato PK
-        string id_freelancer FK
-        string id_cliente FK
-    }
-
-    Freelancer {
-        string experiencia
-        string tecnologias
-        string areas
-        float tarifaH
-        string descripcion
-        int cantProyectosRealizados
+        string id_usuario
         string nombre
         string correo
-        string telefono
-        int numPropuestas
-        string id_freelancer PK
-        string id_usuario FK
+        string contraseña
+        string datos
     }
 
-    Cliente ||--o{ Proyecto : ""
-    Cliente ||--o{ Contrato : ""
-    Cliente ||--o{ Usuario : ""
-    Proyecto ||--o{ Propuesta : ""
-    Proyecto ||--o{ Entregable : ""
-    Propuesta ||--o{ Usuario : ""
-    Freelancer ||--o{ Propuesta : ""
-    Freelancer ||--o{ Contrato : ""
-    Freelancer ||--o{ Usuario : ""
-``` 
+    Pelicula {
+        string id_pelicula
+        string titulo
+        int año
+        string director
+        string descripcion
+        string duracion
+        int vistas
+        string id_genero
+    }
 
+    Genero {
+        string id_genero
+        string nombre
+    }
+
+    Reseña {
+        string id_resena
+        string comentario
+        int likes
+        date fecha
+        string titulo
+        string id_usuario
+        string id_pelicula
+    }
+
+    Calificacion {
+        string id_calificacion
+        int rating
+        string critico
+        int calificador
+        string id_usuario
+        string id_pelicula
+    }
+
+    %% Relaciones principales
+    Usuario ||--o{ Reseña : escribe
+    Usuario ||--o{ Calificacion : realiza
+    Pelicula ||--o{ Reseña : tiene
+    Pelicula ||--o{ Calificacion : recibe
+
+    %% Relación con Genero
+    Genero ||--o{ Pelicula : clasifica
+```
 
 ### Descripción Técnica
 Para cumplir con la segunda forma de normalización se eliminaron dependencias parciales: que ningún campo dependa solo de parte de una clave compuesta.
@@ -764,7 +635,7 @@ Para cumplir con la segunda forma de normalización se eliminaron dependencias p
 
 #### Cambios hechos:
 
-- Se creó una tabla llamada open job , que ayuda a manejar la dependencia de los atributos de propuesta con el freelancer, y conectarlo a travz del opne job publicado con el cliente. 
+- El diseño ya cumple con 2fn, ya que no hay dependencias parciales entre entidades
 
 
 
@@ -786,113 +657,64 @@ Con esta forma de normalización se buscó, Eliminar dependencias transitivas: q
 
 ``` mermaid
 erDiagram
-    Cliente {
-        VARCHAR id_cliente
-        VARCHAR nombre
-        VARCHAR correo
-        VARCHAR telefono
-        INTEGER proyectosPublicados
+    Usuario {
+        string id_usuario
+        string nombre
+        string correo
+        string contraseña
+        string datos
     }
 
-    Freelancer {
-        VARCHAR id_freelancer
-        VARCHAR nombre
-        VARCHAR correo
-        VARCHAR telefono
-        VARCHAR tecnologias
-        INTEGER tarifaH
-        INTEGER cantProyectosRealizados
+    Pelicula {
+        string id_pelicula
+        string titulo
+        int año
+        string director
+        string descripcion
+        string duracion
+        int vistas
+        string id_genero
     }
 
-    Proyecto {
-        VARCHAR id_proyecto
-        VARCHAR descripcion
-        VARCHAR estado
-        INTEGER presupuesto
-        DATE fechaInicio
-        DATE fechaFin
-        VARCHAR clienteId
-        VARCHAR freelanceId
+    Genero {
+        string id_genero
+        string nombre
     }
 
-    Propuesta {
-        VARCHAR id_propuesta
-        VARCHAR descripcion
-        VARCHAR tecnologias
-        VARCHAR estado
-        VARCHAR freelanceId
-        VARCHAR proyectoId
-        INTEGER plazo
+    Reseña {
+        string id_resena
+        string comentario
+        int likes
+        date fecha
+        string titulo
+        string id_usuario
+        string id_pelicula
     }
 
-    Contrato {
-        VARCHAR id_contrato
-        VARCHAR clienteId
-        VARCHAR freelanceId
-        VARCHAR proyectoId
-        DATE fecha
-        VARCHAR estado
-        VARCHAR condiciones
+    Calificacion {
+        string id_calificacion
+        int rating
+        string critico
+        int calificador
+        string id_usuario
+        string id_pelicula
     }
 
-    Entregable {
-        VARCHAR id_entregable
-        VARCHAR descripcion
-        DECIMAL porcentajeBudget
-        VARCHAR proyectoId
-    }
+    %% Relaciones principales
+    Usuario ||--o{ Reseña : escribe
+    Usuario ||--o{ Calificacion : realiza
+    Pelicula ||--o{ Reseña : tiene
+    Pelicula ||--o{ Calificacion : recibe
 
-    Tarea {
-        VARCHAR id_tarea
-        VARCHAR nombre
-        VARCHAR descripcion
-        VARCHAR estado
-        VARCHAR proyectoId
-    }
-
-    openJob {
-        VARCHAR id_openjob
-        VARCHAR id_propuesta
-        VARCHAR nombre
-        VARCHAR descripcion
-    }
-
-    Finanzas {
-        VARCHAR id_finanza
-        VARCHAR proyectoId
-        VARCHAR clienteId
-        VARCHAR freelancerId
-        DECIMAL presupuestoInicial
-        DECIMAL presupuestoRestante
-        DECIMAL solicitudConsignacion
-        VARCHAR estado
-        DATE fecha
-    }
-
-    %% Relaciones
-    Cliente ||--o{ Proyecto : ""
-    Freelancer ||--o{ Propuesta : ""
-    Proyecto ||--o{ Propuesta : ""
-    Cliente ||--o{ Contrato : ""
-    Freelancer ||--o{ Contrato : ""
-    Proyecto ||--o{ Contrato : ""
-    Proyecto ||--o{ Entregable : ""
-    Proyecto ||--o{ Tarea : ""
-    Propuesta ||--o{ openJob : ""
-    Proyecto ||--o{ Finanzas : ""
-    Cliente ||--o{ Finanzas : ""
-    Freelancer ||--o{ Finanzas : ""
-
-
-``` 
+    %% Relación con Genero
+    Genero ||--o{ Pelicula : clasifica
+```
+ 
 
 
 #### Cambios hechos:
 
-- Tareas se convirtió e una tabla y ya no pertenece a entregables relacionndo entregables con las tareas
-
-- Se añadió la tabla finanzas, para poder gestionar las transacciones y finanzas del proyecto
-
+- No existen dependencias transitivas hacia datos
 
 # Construcción del Modelo Físico
 
@@ -908,8 +730,7 @@ Finalmente, hay que tener en cuenta que para desarrollar el modelo físico, se d
 
 ``` js
 
-// ===================== 🔫 ACCIÓN =====================
-db.peliculas.insertMany([
+db.pelicula.insertMany([
   {
     Title: "Duro de matar",
     Year: "1988",
