@@ -13,31 +13,18 @@ export class UserModelMovie {
     this.collection = db.collection("pelicula");
   }
 
-  // Buscar película por ID
-  async findMovieById(movieId) {
-    const session = client.startSession();
-    try {
-      let result;
-      await session.withTransaction(async () => {
-        result = await this.collection.findOne(
-          { _id: new ObjectId(movieId) },
-          { session }
-        );
-      });
-      return result;
-    } finally {
-      await session.endSession();
-    }
-  }
 
   // Ver todas las películas
   async viewMovie() {
+    // Iniciamos la sesion
     const session = client.startSession();
     try {
       let result;
+      // Iniciamos la transaccion y hacemos los procesos
       await session.withTransaction(async () => {
         result = await this.collection.find({}, { session }).toArray();
       });
+      // devolvemos el resultado
       return result;
     } finally {
       await session.endSession();
@@ -85,29 +72,40 @@ export class UserModelComments {
     }
   }
 
-  // Añadir comentario ligado a una película
-  async addComment(data, movieId, userId) {
-    const session = client.startSession();
-    try {
-      let result;
-      await session.withTransaction(async () => {
-        const newComment = {
-          ...data,
-          peliculaId: new ObjectId(movieId),
-          usuarioId: new ObjectId(userId),
-          fecha: new Date(),
-        };
+ // Añadir comentario ligado a una película y aumentar contador
+async addComment(data, movieId, userId) {
+  const session = client.startSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      const newComment = {
+        ...data,
+        peliculaId: new ObjectId(movieId), // referencia a la película
+        usuarioId: new ObjectId(userId),   // referencia al usuario
+        fecha: new Date(),
+      };
 
-        result = await this.collection.insertOne(newComment, { session });
-      });
-      return result;
-    } catch (err) {
-      console.error("Error en transacción:", err);
-      throw err;
-    } finally {
-      await session.endSession();
-    }
+      // Insertar el comentario en la colección "comentario"
+      result = await this.collection.insertOne(newComment, { session });
+
+      // Actualiza el total de comentarios en la colección "pelicula"
+      const db = await connectDB();
+      await db.collection("pelicula").updateOne(
+        // obtiene el object id ,  crea y si existe, aumenta un campo llamado, total comentarios
+        { _id: new ObjectId(movieId) },
+        { $inc: { totalComentarios: 1 } }, // aumenta en 1
+        { session }
+      );
+    });
+    return result;
+  } catch (err) {
+    console.error("Error en transacción:", err);
+    throw err;
+  } finally {
+    await session.endSession();
   }
+}
+
 
   // Contar comentarios por película
   async countCommentsByMovie(movieId) {
@@ -115,6 +113,7 @@ export class UserModelComments {
     try {
       let total;
       await session.withTransaction(async () => {
+        // Aqui cuenta la cantidad de documentos que hay en mongo db, osea comentarios
         total = await this.collection.countDocuments(
           { peliculaId: new ObjectId(movieId) },
           { session }
@@ -128,7 +127,7 @@ export class UserModelComments {
 }
 
 
-export default class UserModelRegister {
+export  class UserModelRegister {
   constructor() {
     this.collection = null;
   }
@@ -184,9 +183,9 @@ export default class UserModelRegister {
     }
   }
 
-  /**
-   * Login de usuario con bcrypt
-   */
+  
+   // Login de usuario con bcrypt
+   
   async loginUser({ email, password }) {
     try {
       const user = await this.collection.findOne({ email });
@@ -210,5 +209,34 @@ export default class UserModelRegister {
     } catch (err) {
       throw new Error("Error en login: " + err.message);
     }
+    
   }
+
+    // Buscar usuario por ID 
+    async findUserById(userId) {
+      const db = await connectDB();
+      const session = db.client.startSession();
+  
+      try {
+        let user;
+
+        // Busca el usuario en la coleccion por su id 
+        await session.withTransaction(async () => {
+          user = await db.collection(this.collection).findOne(
+            { _id: new ObjectId(userId) },
+            { session }
+          );
+        });
+        return user;
+      } catch (error) {
+        console.error("Error en findUserById:", error);
+        throw error;
+      } finally {
+        await session.endSession();
+      }
+    }
+  
+  
 }
+
+
