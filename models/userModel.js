@@ -206,7 +206,7 @@ async  addRating(data, movieId, userId) {
       await db.this.collection.updateOne(
         // obtiene el object id ,  crea y si existe, aumenta un campo llamado, total comentarios
         { _id: new ObjectId(movieId) },
-        { $inc: { totalComentarios: 1 } }, // aumenta en 1
+        { $inc: { totalratings: 1 } }, // aumenta en 1
         { session }
       );
     });
@@ -216,7 +216,23 @@ async  addRating(data, movieId, userId) {
     }
   }
 
+  async viewRating() {
+    const session = client.startSession();
+    try {
+      let result;
+      await session.withTransaction(async () => {
+        result = await this.collection.find({}, { session }).toArray();
+      });
+      return result;
+    } finally {
+      await session.endSession();
+    }
+  }
 }
+
+
+
+
 export class UserModelRegister {
   constructor() {
     this.collection = null;

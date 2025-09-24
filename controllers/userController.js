@@ -38,7 +38,7 @@ export class  UserController {
       const mensaje = data.user.role === "admin" 
       ? "Bienvenido administrador" 
       : `Bienvenido ${data.user.name}`;
-      
+
       res.json({
         msg: `Bienvenido ${data.user.role === "admin" ? "administrador" : "usuario"}`,
         user: data.user,
@@ -48,4 +48,8 @@ export class  UserController {
       res.status(500).json({ msg: "Error al iniciar sesión", error: error.message });
     }
   }
+}
+
+export class UserControllerMovies {
+  
 }
