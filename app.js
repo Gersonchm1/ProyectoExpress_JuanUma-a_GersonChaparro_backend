@@ -3,7 +3,6 @@ import express from "express";
 import dotenv from "dotenv";
 import passport from "passport";
 import cors from "cors";
-import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 
 // Configuración
@@ -15,7 +14,6 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
-app.use(morgan("dev"));
 app.use(express.json()); 
 
 // Passport

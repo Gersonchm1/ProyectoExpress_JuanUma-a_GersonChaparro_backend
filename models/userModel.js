@@ -124,7 +124,57 @@ async addComment(data, movieId, userId) {
       await session.endSession();
     }
   }
+
+   async  deleteComments(movieId) {
+    const session = client.startSession();
+    try {
+      let total;
+      await session.withTransaction(async () => {
+        // Aqui, elimina de la coleccion los cmentarios con el id de la pelicula ingresado 
+        // y crea la sesion
+        total = await this.collection.deleteOne(
+          { peliculaId: new ObjectId(movieId) },
+          { session }
+        );
+      });
+      return total;
+    } finally {
+      await session.endSession();
+    }
+  }
+  
+ // Dentro de tu modelo de reseñas
+async UpdateComments(data, movieId, userId) {
+  const session = client.startSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      // Construir la reseña con IDs controlados en el backend
+      const reviewData = {
+        ...data,
+        id_usuario: new ObjectId(userId),
+        id_pelicula: new ObjectId(movieId),
+        fecha: new Date()
+      };
+
+      // Insertar o actualizar (si ya existe una reseña del mismo usuario para esa película)
+      result = await this.collection.updateOne(
+        {
+          id_usuario: new ObjectId(userId),
+          id_pelicula: new ObjectId(movieId),
+        },
+        { $set: reviewData },
+        { upsert: true, session }
+      );
+    });
+
+    return result;
+  } finally {
+    await session.endSession();
+  }
 }
+}
+
 
 
 export  class UserModelRegister {
