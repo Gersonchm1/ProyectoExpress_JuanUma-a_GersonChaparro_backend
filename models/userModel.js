@@ -142,7 +142,7 @@ async addComment(data, movieId, userId) {
       await session.endSession();
     }
   }
-  
+
  // Dentro de tu modelo de reseñas
 async UpdateComments(data, movieId, userId) {
   const session = client.startSession();
@@ -175,6 +175,46 @@ async UpdateComments(data, movieId, userId) {
 }
 }
 
+export class UserModelRatings{ 
+    constructor() {
+    this.collection = null;
+  }
+
+  // Inicializa la colección
+  async init() {
+    const db = await connectDB();
+    this.collection = db.collection("calificacion");
+  }
+
+async  addRating(data, movieId, userId) {
+    const session = client.startSession();
+    try {
+      let total;
+      await session.withTransaction(async () => {
+
+              const newRating = {
+        ...data,
+       id_pelicula: new ObjectId(movieId), 
+       id_usuario: new ObjectId(userId),   
+        fecha: new Date(),
+      };
+       
+        // Añaddimos el nuevo rating y la informacion
+    const db = await connectDB();
+      await db.this.collection.updateOne(
+        // obtiene el object id ,  crea y si existe, aumenta un campo llamado, total comentarios
+        { _id: new ObjectId(movieId) },
+        { $inc: { totalComentarios: 1 } }, // aumenta en 1
+        { session }
+      );
+    });
+      return total;
+    } finally {
+      await session.endSession();
+    }
+  }
+
+}
 
 
 export  class UserModelRegister {
