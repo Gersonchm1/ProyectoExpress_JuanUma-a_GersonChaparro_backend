@@ -1,6 +1,7 @@
 import { client } from "../config/db.js";
 import { UserModelRegister } from "../models/userModel.js";
 
+
 const userModel = new UserModelRegister();
 
 export class  UserController {
@@ -8,10 +9,17 @@ export class  UserController {
   static async register(req, res) {
     const session = client.startSession();
     try {
-      const result = await userModel.register(req.body, session);
+      const { nombre, correo, contrasena } = req.body;
+  
+      const result = await userModel.registerUser({
+        name: nombre,       
+        email: correo,      
+        password: contrasena 
+      }, session);
+  
       res.status(201).json({
         msg: "Usuario registrado con éxito",
-        id: result.insertedId,
+        id: result._id,
       });
     } catch (error) {
       res.status(500).json({ msg: "Error al registrar usuario", error: error.message });
@@ -19,33 +27,25 @@ export class  UserController {
       await session.endSession();
     }
   }
-
-  // Login usando el modelo que ya tienes
+  
   static async login(req, res) {
     try {
       const { email, contrasena } = req.body;
 
-      // tu modelo maneja la validación y genera token
-      const data = await userModel.login(email, contrasena);
-      if (!data) return res.status(401).json({ msg: "Credenciales inválidas" });
+      // Llamada al modelo para validar usuario y generar token
+      const data = await userModel.loginUser({ email, password: contrasena });
 
-      // Respuesta según rol
-      if (data.uuario.tipo === "admin") {
-        return res.json({
-          msg: "Bienvenido administrador",
-          token: data[`bearer`].token ,
-          user: { id: data.user._id, email: data.user.email },
-        });
-      }
-
+      const mensaje = data.user.role === "admin" 
+      ? "Bienvenido administrador" 
+      : `Bienvenido ${data.user.name}`;
+      
       res.json({
-        msg: "Bienvenido usuario",
-        token: data.token,
-        user: { id: data.user._id, email: data.user.email },
+        msg: `Bienvenido ${data.user.role === "admin" ? "administrador" : "usuario"}`,
+        user: data.user,
+        token: `Bearer ${data.token}`
       });
     } catch (error) {
       res.status(500).json({ msg: "Error al iniciar sesión", error: error.message });
     }
   }
 }
-

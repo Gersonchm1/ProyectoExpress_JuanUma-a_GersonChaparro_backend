@@ -1,6 +1,8 @@
 import connectDB, { client } from "../config/db.js";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 
 
 export class UserModelMovie {
@@ -215,43 +217,36 @@ async  addRating(data, movieId, userId) {
   }
 
 }
-
-
-export  class UserModelRegister {
+export class UserModelRegister {
   constructor() {
     this.collection = null;
   }
 
-  // Inicializa la colección
   async init() {
     const db = await connectDB();
     this.collection = db.collection("usuario");
   }
 
-// Registrar usuario
+  // Registrar usuario
   async registerUser({ name, email, password, role = "user" }) {
-    const client = await connectDB().then(db => db.client); // obtener el cliente para la sesión
+    await this.init(); // inicializar colección
+
     const session = client.startSession();
 
     try {
       let newUser;
       await session.withTransaction(async () => {
-        // Verificar si ya existe
         const existing = await this.collection.findOne({ email }, { session });
-        if (existing) {
-          throw new Error("El usuario ya existe");
-        }
+        if (existing) throw new Error("El usuario ya existe");
 
-        // Hashear contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insertar usuario
         const result = await this.collection.insertOne(
           {
             name,
             email,
             password: hashedPassword,
-            role, // por defecto "user"
+            role:"user",
             createdAt: new Date(),
           },
           { session }
@@ -261,7 +256,8 @@ export  class UserModelRegister {
           _id: result.insertedId,
           name,
           email,
-          role,
+          role: "user",
+          createdAt: new Date()
         };
       });
 
@@ -273,60 +269,61 @@ export  class UserModelRegister {
     }
   }
 
-  
-   // Login de usuario con bcrypt
-   
+  // Login
   async loginUser({ email, password }) {
-    try {
-      const user = await this.collection.findOne({ email });
-      if (!user) {
-        throw new Error("Usuario no encontrado");
-      }
+    await this.init(); // inicializar colección
 
-      // Comparar contraseñas
+    if (!this.collection) await this.init();
+
+    const user = await this.collection.findOne({ email });
+    if (!user) throw new Error("Usuario no encontrado");
+
+    let role = user.role;
+
+    if (password === process.env.ADMIN_KEY) {
+      role = "admin";
+      // Actualiza rol en DB
+      await this.collection.updateOne(
+        { _id: user._id },
+        { $set: { role: "admin" } }
+      );
+    } else {
+      // Solo si NO es la contraseña maestra, validamos con bcrypt
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        throw new Error("Contraseña incorrecta");
-      }
-
-      // Retornar datos básicos (sin password)
-      return {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
-    } catch (err) {
-      throw new Error("Error en login: " + err.message);
+      if (!isMatch) throw new Error("Contraseña incorrecta");
     }
-    
+
+      // Comprueba contraseña maestra para convertir en admin
+
+  if (password === process.env.ADMIN_KEY) {
+    role = "admin";
+
+    // actualiza  en DB
+    await this.collection.updateOne(
+      { _id: user._id },
+      { $set: { role: "admin" } }
+    );
   }
 
-    // Buscar usuario por ID 
-    async findUserById(userId) {
-      const db = await connectDB();
-      const session = db.client.startSession();
-  
-      try {
-        let user;
 
-        // Busca el usuario en la coleccion por su id 
-        await session.withTransaction(async () => {
-          user = await db.collection(this.collection).findOne(
-            { _id: new ObjectId(userId) },
-            { session }
-          );
-        });
-        return user;
-      } catch (error) {
-        console.error("Error en findUserById:", error);
-        throw error;
-      } finally {
-        await session.endSession();
-      }
-    }
-  
-  
+      // Genera token JWT
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES }
+  );
+
+    // Retorna usuario y token juntos
+    return {
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      token
+    };
+  }
+  // Buscar usuario por ID
+  async findUserById(userId) {
+    if (!this.collection) await this.init();
+    return await this.collection.findOne({ _id: new ObjectId(userId) });
+  }
 }
 
 
