@@ -260,6 +260,8 @@ async  addRating(data, movieId, userId) {
   }
 
   async viewRating() {
+
+    
     const session = client.startSession();
     try {
       let result;

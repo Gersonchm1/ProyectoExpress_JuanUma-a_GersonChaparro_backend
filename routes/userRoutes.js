@@ -1,59 +1,58 @@
 import express from "express";
 import passport from "passport";
 import rateLimit from "express-rate-limit"; 
-import {UserController} from "../controllers/userController.js";
+import { UserController } from "../controllers/userController.js";
+import { checkRole } from "../middlewares/checkRole.js";
 
 const router = express.Router();
 
-// Middleware de roles (lo definimos en este archivo)
-function checkRole(...roles) {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ msg: "No autenticado" });
-    }
-    if (!roles.includes(req.user.rol)) {
-      return res.status(403).json({ msg: "Acceso denegado" });
-    }
-    next();
-  };
-}
-
-// Aplicando rate limit (ejemplo: proteger login contra ataques de fuerza bruta)
+// Limitado la cantidad de intentos de login 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 10, // máximo 10 solicitudes en ese tiempo
+  max: 20,
   message: "Demasiados intentos de login desde esta IP, inténtalo más tarde.",
 });
 
-// Registro (público)
+//  Rutas públicas para registrar y login ,la cual incluye el limitador de solicitudes
 router.post("/register", UserController.register);
-
-// Login (público, pero con limitador)
 router.post("/login", loginLimiter, UserController.login);
 
-// Ruta protegida: solo usuarios autenticados (Passport verifica JWT)
-router.get(
-  "/profile",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json({
-      msg: "Perfil del usuario autenticado",
-      user: req.user,
-    });
-  }
-);
+//  Aqui empieza a pedir
+router.use(passport.authenticate("jwt", { session: false }));
 
-// Ruta protegida: solo admin
-router.get(
-  "/admin",
-  passport.authenticate("jwt", { session: false }),
-  checkRole("admin"), // validación del rol
-  (req, res) => {
-    res.json({
-      msg: "Bienvenido administrador",
-      user: req.user,
-    });
-  }
-);
+// Perfil del usuario autenticado
+router.get("/profile", (req, res) => {
+  res.json({ msg: "Perfil del usuario autenticado", user: req.user });
+});
+
+// Ruta admin (solo role = admin)
+router.get("/admin", checkRole("admin"), (req, res) => {
+  res.json({ msg: "Bienvenido administrador", user: req.user });
+});
+
+//  Rutas de películas
+router.get("/peliculas", UserController.getPeliculas);
+router.get("/peliculas/:id", UserController.getPeliculaById);
+router.get("/peliculas/top-rated", UserController.getTopRatedMovies);
+router.get("/peliculas/top-viewed", UserController.getTopViewedMovies);
+router.patch("/peliculas/:id/views", UserController.incrementViews);
+
+//  Rutas de ratings
+router.get("/ratings", UserController.getAllRatings);
+router.get("/ratings/:id_pelicula", UserController.getRatingsByMovie);
+router.post("/ratings/:id_pelicula", UserController.addRating);
+router.get("/ratings/top", UserController.getTopRatings);
+
+//  Rutas de reseñas / comentarios
+router.get("/resenas", UserController.getResenas);
+router.get("/resenas/:id_resena", UserController.getResenaById);
+router.put("/resenas/:id_resena", UserController.updateResena);
+router.delete("/resenas/:id_resena", UserController.deleteResena);
+
+router.get("/resenas/movie/:movieId", UserController.getResenasByMovie);
+router.delete("/resenas/movie/:movieId", UserController.deleteResenasByMovie);
+router.get("/resenas/movie/:movieId/count", UserController.countResenasByMovie);
+router.post("/resenas/movie/:movieId/user/:userId", UserController.addResena);
+router.put("/resenas/movie/:movieId/user/:userId", UserController.updateComment);
 
 export default router;

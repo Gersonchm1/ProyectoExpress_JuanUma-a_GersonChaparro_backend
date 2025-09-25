@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: API de Películas, Ratings y Reseñas
+  version: 1.0.0
+  description: Documentación de la API con usuarios, películas, ratings y reseñas.
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - Usuarios
+      summary: Registro de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - email
+                - password
+      responses:
+        "201":
+          description: Usuario registrado exitosamente
+
+  /users/login:
+    post:
+      tags:
+        - Usuarios
+      summary: Login de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Login exitoso con JWT
+
+  /users/profile:
+    get:
+      tags:
+        - Usuarios
+      summary: Perfil del usuario autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Perfil del usuario autenticado
+
+  /users/admin:
+    get:
+      tags:
+        - Usuarios
+      summary: Ruta exclusiva para administradores
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Acceso permitido solo a admins
+
+  /peliculas:
+    get:
+      tags:
+        - Peliculas
+      summary: Listar todas las películas
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 0
+      responses:
+        "200":
+          description: Lista de películas
+
+  /peliculas/top-rated:
+    get:
+      tags:
+        - Peliculas
+      summary: Listar películas con mejor rating promedio
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        "200":
+          description: Lista de películas con mejor rating
+
+  /peliculas/top-viewed:
+    get:
+      tags:
+        - Peliculas
+      summary: Listar películas más vistas
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        "200":
+          description: Lista de películas más vistas
+
+  /ratings/{id_pelicula}:
+    post:
+      tags:
+        - Ratings
+      summary: Añadir rating a una película
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_pelicula
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+              required:
+                - rating
+      responses:
+        "201":
+          description: Rating añadido correctamente
+
+  /resenas/{id_pelicula}:
+    get:
+      tags:
+        - Reseñas
+      summary: Listar reseñas de una película
+      parameters:
+        - name: id_pelicula
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de reseñas
+
+    post:
+      tags:
+        - Reseñas
+      summary: Crear una reseña para una película
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_pelicula
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comentario:
+                  type: string
+                calificacion:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+              required:
+                - comentario
+      responses:
+        "201":
+          description: Reseña creada exitosamente
+
+  /resenas/{id_resena}:
+    put:
+      tags:
+        - Reseñas
+      summary: Actualizar una reseña existente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_resena
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comentario:
+                  type: string
+                calificacion:
+                  type: integer
+      responses:
+        "200":
+          description: Reseña actualizada
+
+    delete:
+      tags:
+        - Reseñas
+      summary: Eliminar una reseña
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_resena
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reseña eliminada
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Petición inválida
+    Unauthorized:
+      description: No autenticado
+    Forbidden:
+      description: Acceso denegado
+    NotFound:
+      description: No encontrado

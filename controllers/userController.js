@@ -62,6 +62,9 @@ export class  UserController {
   }
 }
 
+// ###################################################################################################
+                                //PELICULAS
+//####################################################################################################
 export class MovieController {
   static async viewMovies(req, res) {
     try {
@@ -81,7 +84,7 @@ export class MovieController {
       //  el modelo de las peliculas
       await movieModel.init();
       // vuelve limit, un entero
-      const limit = parseInt(req.query.limit)
+      const limit = parseInt(req.query.limit)|| 20;
       // Hace la funcion del model con el parametro que es el limit 
       const movies = await movieModel.topMoviesByViews(limit);
       // devuelve la funcion, sino, lanza error
@@ -108,6 +111,9 @@ export class MovieController {
   }
 }
 
+// #############################################################################################################
+//                                               COMENTARIOS
+//##############################################################################################################
 
 export class CommentController {
   static async viewAll(req, res) {
@@ -128,8 +134,13 @@ export class CommentController {
       // inicia el modelo de comentarios
       await commentModel.init();
 
+      // saca el id de la pelicula de los parametros
       const { id_pelicula } = req.params;
+
+      // Luego , llama a la funcion de ver comentarios por pelicula, tomando el id como referencia
       const comments = await commentModel.viewCommentByMovie(id_pelicula);
+
+      // Devuelve la resuesta en json, y lnza si hay error
       return res.json(comments);
     } catch (error) {
       return res.status(500).json({ msg: "Error al obtener comentarios por película", error: error.message });
@@ -138,9 +149,15 @@ export class CommentController {
 
   static async add(req, res) {
     try {
+      // iniciamos el modelo de comentarios 
       await commentModel.init();
+
+      //recibimos el id del usuario y de la pelicula
       const { id_pelicula, id_usuario } = req.params;
+
+      // luego llamamos a la funcion para añadir comentarrs y que reciba la data y los ids
       const result = await commentModel.addComment(req.body, id_pelicula, id_usuario);
+      // luego develve la respuesa en json y notifica si hay error o no
       return res.status(201).json({ msg: "Comentario agregado", result });
     } catch (error) {
       return res.status(500).json({ msg: "Error al agregar comentario", error: error.message });
@@ -149,9 +166,14 @@ export class CommentController {
 
   static async countByMovie(req, res) {
     try {
+      // inicamos el modelo de comentario
       await commentModel.init();
+      //Recibimos el id de pelicula de los parametros
       const { id_pelicula } = req.params;
+
+      // Luego llama la funcion para llamar contar los comentarios por pelicula 
       const total = await commentModel.countCommentsByMovie(id_pelicula);
+      // damos la respuesta en json, con el id de la pelicula y el total de comentarios, sino, lanza error
       return res.json({ id_pelicula, totalComentarios: total });
     } catch (error) {
       return res.status(500).json({ msg: "Error al contar comentarios", error: error.message });
@@ -160,9 +182,15 @@ export class CommentController {
 
   static async deleteByMovie(req, res) {
     try {
+      // iniciamos el modelo
       await commentModel.init();
+
+      // tomamos el id de la pelicula 
       const { id_pelicula } = req.params;
+
+      // luego lama a la funcion de eliminarcomentarios de la pelicula
       const result = await commentModel.deleteComments(id_pelicula);
+      // devuelve un json con la informacion eliminada , sino, lanza error
       return res.json({ msg: "Comentarios eliminados", result });
     } catch (error) {
       return res.status(500).json({ msg: "Error al eliminar comentarios", error: error.message });
@@ -171,9 +199,16 @@ export class CommentController {
 
   static async update(req, res) {
     try {
+
+      // iniciamos el modelo de comentarios
       await commentModel.init();
+      // recbimos los dats de los parametros 
       const { id_pelicula, id_usuario } = req.params;
+
+      // ejecutamos la funcion update commets con el id de pelicula, de usuaro y la informacion del body 
       const result = await commentModel.UpdateComments(req.body, id_pelicula, id_usuario);
+
+      // Devuelve la respuesta de la informacion en json , ysi hay error , lo notifica
       return res.json({ msg: "Reseña actualizada", result });
     } catch (error) {
       return res.status(500).json({ msg: "Error al actualizar reseña", error: error.message });
@@ -181,12 +216,22 @@ export class CommentController {
   }
 }
 
+//#################################################################################
+//                                        RATINGS
+//#################################################################################
+
+
 export class RatingController {
   static async add(req, res) {
     try {
+      // inicializamos el modelo de rating
       await ratingModel.init();
+      // recibimos los atributos de los parametros 
       const { id_pelicula, id_usuario } = req.params;
+
+      // llamamos a la funcion para añadir rating y que recibe lada y los ids , de usuario y pelicula
       const result = await ratingModel.addRating(req.body, id_pelicula, id_usuario);
+      // devuelve la respuesta y la inf en json , si hay algun error, notifica
       return res.status(201).json({ msg: "Rating agregado", result });
     } catch (error) {
       return res.status(500).json({ msg: "Error al agregar rating", error: error.message });
@@ -195,7 +240,11 @@ export class RatingController {
 
   static async viewAll(req, res) {
     try {
+
+      // Iniciamos el modelo de rating
       await ratingModel.init();
+
+      // llamamos la funcion de ver ratings
       const ratings = await ratingModel.viewRating();
       return res.json(ratings);
     } catch (error) {
@@ -205,9 +254,14 @@ export class RatingController {
 
   static async topRated(req, res) {
     try {
+      // Iniciamos el modelo e rating
       await ratingModel.init();
+
+      // volvemos el limite de la query int, y le ponemos 20 por si algo fall a
       const limit = parseInt(req.query.limit) || 20;
+      // llamaos a la funcion para ver las peliculas mejor calificadas
       const result = await ratingModel.topRatedMovies(limit);
+      // devuelve la respuesta en json , y si algo falla, lanza error
       return res.json(result);
     } catch (error) {
       return res.status(500).json({ msg: "Error al obtener top por rating", error: error.message });
