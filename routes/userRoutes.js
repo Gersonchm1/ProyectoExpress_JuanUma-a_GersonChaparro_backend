@@ -1,8 +1,9 @@
 import express from "express";
 import passport from "passport";
 import rateLimit from "express-rate-limit"; 
-import { UserController } from "../controllers/userController.js";
-import { checkRole } from "../middlewares/checkRole.js";
+import { checkRole } from "../middleware/checkrole.js";
+
+import { UserController, MovieController, CommentController, RatingController } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -13,11 +14,11 @@ const loginLimiter = rateLimit({
   message: "Demasiados intentos de login desde esta IP, inténtalo más tarde.",
 });
 
-//  Rutas públicas para registrar y login ,la cual incluye el limitador de solicitudes
+//  Rutas públicas
 router.post("/register", UserController.register);
 router.post("/login", loginLimiter, UserController.login);
 
-//  Aqui empieza a pedir
+//  Middleware de autenticación
 router.use(passport.authenticate("jwt", { session: false }));
 
 // Perfil del usuario autenticado
@@ -30,29 +31,23 @@ router.get("/admin", checkRole("admin"), (req, res) => {
   res.json({ msg: "Bienvenido administrador", user: req.user });
 });
 
-//  Rutas de películas
-router.get("/peliculas", UserController.getPeliculas);
-router.get("/peliculas/:id", UserController.getPeliculaById);
-router.get("/peliculas/top-rated", UserController.getTopRatedMovies);
-router.get("/peliculas/top-viewed", UserController.getTopViewedMovies);
-router.patch("/peliculas/:id/views", UserController.incrementViews);
 
-//  Rutas de ratings
-router.get("/ratings", UserController.getAllRatings);
-router.get("/ratings/:id_pelicula", UserController.getRatingsByMovie);
-router.post("/ratings/:id_pelicula", UserController.addRating);
-router.get("/ratings/top", UserController.getTopRatings);
+// ====================== Películas ======================
+router.get("/peliculas", MovieController.viewMovies);
+router.get("/peliculas/top", MovieController.topMovies);
+router.put("/peliculas/:id/views", MovieController.incrementViews);
 
-//  Rutas de reseñas / comentarios
-router.get("/resenas", UserController.getResenas);
-router.get("/resenas/:id_resena", UserController.getResenaById);
-router.put("/resenas/:id_resena", UserController.updateResena);
-router.delete("/resenas/:id_resena", UserController.deleteResena);
+// ====================== Ratings ======================
+router.get("/ratings", RatingController.viewAll);
+router.post("/ratings/:id_pelicula/:id_usuario", RatingController.add);
+router.get("/ratings/top", RatingController.topRated);
 
-router.get("/resenas/movie/:movieId", UserController.getResenasByMovie);
-router.delete("/resenas/movie/:movieId", UserController.deleteResenasByMovie);
-router.get("/resenas/movie/:movieId/count", UserController.countResenasByMovie);
-router.post("/resenas/movie/:movieId/user/:userId", UserController.addResena);
-router.put("/resenas/movie/:movieId/user/:userId", UserController.updateComment);
+// ====================== Comentarios ======================
+router.get("/resenas", CommentController.viewAll);
+router.get("/resenas/:id_pelicula", CommentController.viewByMovie);
+router.post("/resenas/:id_pelicula/:id_usuario", CommentController.add);
+router.put("/resenas/:id_pelicula/:id_usuario", CommentController.update);
+router.delete("/resenas/:id_pelicula", CommentController.deleteByMovie);
+router.get("/resenas/:id_pelicula/count", CommentController.countByMovie);
 
 export default router;

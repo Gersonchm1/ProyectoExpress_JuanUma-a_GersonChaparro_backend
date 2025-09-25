@@ -4,10 +4,20 @@ import dotenv from "dotenv";
 import passport from "passport";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-
+import path from "path";
+import { fileURLToPath } from "url";
 // Configuración
 dotenv.config();
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 👉 Servir la carpeta public
+app.use(express.static(path.join(__dirname, "public")));
+
+
+
 
 app.use(cors({
   origin: "http://localhost:3000", 

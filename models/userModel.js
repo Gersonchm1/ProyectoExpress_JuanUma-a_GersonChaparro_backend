@@ -419,5 +419,3 @@ export class UserModelRegister {
     return await this.collection.findOne({ _id: new ObjectId(userId) });
   }
 }
-
-
