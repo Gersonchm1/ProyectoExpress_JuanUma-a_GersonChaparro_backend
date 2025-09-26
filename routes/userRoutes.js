@@ -7,18 +7,18 @@ import { UserController, MovieController, CommentController, RatingController } 
 
 const router = express.Router();
 
-// Limitado la cantidad de intentos de login 
+// Limita la cantidad de intentos de login 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000, //por 15 minutos 20 intemtos
   max: 20,
   message: "Demasiados intentos de login desde esta IP, inténtalo más tarde.",
 });
 
-//  Rutas públicas
+//  Rutas públicas en las cuales el login 
 router.post("/register", UserController.register);
 router.post("/login", loginLimiter, UserController.login);
 
-//  Middleware de autenticación
+//  Middleware de autenticación con passport
 router.use(passport.authenticate("jwt", { session: false }));
 
 // Perfil del usuario autenticado
@@ -32,17 +32,17 @@ router.get("/admin", checkRole("admin"), (req, res) => {
 });
 
 
-// ====================== Películas ======================
+// ====================== Rutas Películas ======================
 router.get("/peliculas", MovieController.viewMovies);
 router.get("/peliculas/top", MovieController.topMovies);
 router.put("/peliculas/:id/views", MovieController.incrementViews);
 
-// ====================== Ratings ======================
+// ====================== Rutas Ratings ======================
 router.get("/ratings", RatingController.viewAll);
 router.post("/ratings/:id_pelicula/:id_usuario", RatingController.add);
 router.get("/ratings/top", RatingController.topRated);
 
-// ====================== Comentarios ======================
+// ====================== Rutas Comentarios ======================
 router.get("/resenas", CommentController.viewAll);
 router.get("/resenas/:id_pelicula", CommentController.viewByMovie);
 router.post("/resenas/:id_pelicula/:id_usuario", CommentController.add);

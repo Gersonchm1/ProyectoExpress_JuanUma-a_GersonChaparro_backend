@@ -194,7 +194,7 @@ async UpdateComments(data, movieId, userId) {
   try {
     let result;
     await session.withTransaction(async () => {
-      // Construir la reseña con IDs controlados en el backend
+      // Se ponen los datos a actualizar
       const reviewData = {
         ...data,
         id_usuario: new ObjectId(userId),
@@ -208,7 +208,10 @@ async UpdateComments(data, movieId, userId) {
           id_usuario: new ObjectId(userId),
           id_pelicula: new ObjectId(movieId),
         },
+
+        // actualiza la informacion necesaria
         { $set: reviewData },
+        // si el documento existe, lo actualiza, sino , lo crea
         { upsert: true, session }
       );
     });
@@ -315,6 +318,57 @@ async  addRating(data, movieId, userId) {
 }
 }
 
+// #################################################################################################
+
+//                                                Categoria
+                                      
+// #################################################################################################
+
+export class UserModelCategory{
+    constructor() {
+    this.collection = null;
+  }
+
+    // Inicializa la colección
+  async init() {
+    const db = await connectDB();
+    this.collection = db.collection("genero");
+  }
+
+   async viewCategory() {
+    const session = client.startSession();
+    try {
+      let result;
+      // inicia la transaccion
+      await session.withTransaction(async () => {
+        // busca toda la informacion de categoria en la db
+        result = await this.collection.find({}, { session }).toArray();
+      });
+      // devuelve la info
+      return result;
+    } finally {
+      await session.endSession();
+    }
+  }
+    async viewCategoryByMovie(categoryId) {
+    const session = client.startSession();
+    try {
+      let result;
+      // iniciamos la transaccion
+      await session.withTransaction(async () => {
+        result = await this.collection
+        // encuentra la categoria por el id que recibe
+          .find({ _id: new ObjectId(categoryId) }, { session })
+          .toArray();
+      });
+      // devuelve la informacion 
+      return result;
+    } finally {
+      await session.endSession();
+    }
+  }
+
+}
 
 
 
