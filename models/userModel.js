@@ -59,7 +59,7 @@ async incrementViews(movieId) {
 
       // Actualiza en la coleccion la parte de vistas
       result = await this.collection.updateOne(
-        { _id: new ObjectId(movieId) },
+        { _id: movieId },
         { $inc: { Vistas: 1 } }, // suma +1 al campo Vistas
         { session }
       );
@@ -108,7 +108,7 @@ export class UserModelComments {
       await session.withTransaction(async () => {
         result = await this.collection
         // encuentra la pelicula por el id que recibe
-          .find({ id_pelicula: new ObjectId(movieId) }, { session })
+          .find({ _id:movieId}, { session })
           .toArray();
       });
       return result;
@@ -125,8 +125,8 @@ async addComment(data, movieId, userId) {
     await session.withTransaction(async () => {
       const newComment = {
         ...data,
-        id_pelicula: new ObjectId(movieId), // referencia a la película
-        id_usuario: new ObjectId(userId),   // referencia al usuario
+        _id: movieId, // referencia a la película
+        id_usuario: userId,   // referencia al usuario
         fecha: new Date(),
       };
 
@@ -137,7 +137,7 @@ async addComment(data, movieId, userId) {
       const db = await connectDB();
       await db.collection("pelicula").updateOne(
         // obtiene el object id ,  crea y si existe, aumenta un campo llamado, total comentarios
-        { _id: new ObjectId(movieId) },
+        { _id: movieId },
         { $inc: { totalComentarios: 1 } }, // aumenta en 1
         { session }
       );
@@ -160,7 +160,7 @@ async addComment(data, movieId, userId) {
       await session.withTransaction(async () => {
         // Aqui cuenta la cantidad de documentos que hay en mongo db, osea comentarios
         total = await this.collection.countDocuments(
-          { id_pelicula: new ObjectId(movieId) },
+          { _id: movieId },
           { session }
         );
       });
@@ -178,7 +178,7 @@ async addComment(data, movieId, userId) {
         // Aqui, elimina de la coleccion los cmentarios con el id de la pelicula ingresado 
         // y crea la sesion
         total = await this.collection.deleteOne(
-          { id_pelicula: new ObjectId(movieId) },
+          { _id: movieId },
           { session }
         );
       });
@@ -197,16 +197,16 @@ async UpdateComments(data, movieId, userId) {
       // Se ponen los datos a actualizar
       const reviewData = {
         ...data,
-        id_usuario: new ObjectId(userId),
-        id_pelicula: new ObjectId(movieId),
+        id_usuario: userId,
+        _id: movieId,
         fecha: new Date()
       };
 
       // Insertar o actualizar (si ya existe una reseña del mismo usuario para esa película)
       result = await this.collection.updateOne(
         {
-          id_usuario: new ObjectId(userId),
-          id_pelicula: new ObjectId(movieId),
+          id_usuario:  userId,
+          _id: movieId,
         },
 
         // actualiza la informacion necesaria
@@ -234,29 +234,31 @@ export class UserModelRatings{
     this.collection = db.collection("calificacion");
   }
 
-async  addRating(data, movieId, userId) {
+  async addRating(data, movieId, userId) {
     const session = client.startSession();
     try {
-      let total;
+      let result;
       await session.withTransaction(async () => {
-
-              const newRating = {
-        ...data,
-       id_pelicula: new ObjectId(movieId), 
-       id_usuario: new ObjectId(userId),   
-        fecha: new Date(),
-      };
-       
-        // Añaddimos el nuevo rating y la informacion
-    const db = await connectDB();
-      await db.this.collection.updateOne(
-        // obtiene el object id ,  crea y si existe, aumenta un campo llamado, total comentarios
-        { _id: new ObjectId(movieId) },
-        { $inc: { totalratings: 1 } }, // aumenta en 1
-        { session }
-      );
-    });
-      return total;
+        //  Creamos el nuevo rating
+        const newRating = {
+          ...data,
+          _id: movieId,            
+          id_usuario: userId,
+          fecha: new Date(),
+        };
+  
+        // Insertamos el rating en esta colección (this.collection = "rating")
+        await this.collection.insertOne(newRating, { session });
+  
+        //  Actualizamos contador en películas
+        result = await db.collection("pelicula").updateOne(
+          { _id: movieId },                 // 🔹 si _id es string, lo dejas así
+          { $inc: { totalratings: 1 } },    // 🔹 suma 1 al contador
+          { session }
+        );
+      });
+  
+      return result;
     } finally {
       await session.endSession();
     }
@@ -358,7 +360,7 @@ export class UserModelCategory{
       await session.withTransaction(async () => {
         result = await this.collection
         // encuentra la categoria por el id que recibe
-          .find({ _id: new ObjectId(categoryId) }, { session })
+          .find({   id_genero: categoryId }, { session })
           .toArray();
       });
       // devuelve la informacion 

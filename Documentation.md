@@ -533,7 +533,6 @@ erDiagram
         string id_calificacion
         int rating
         string critico
-        int calificador
         string id_usuario
         string id_pelicula
     }
@@ -612,7 +611,6 @@ erDiagram
         string id_calificacion
         int rating
         string critico
-        int calificador
         string id_usuario
         string id_pelicula
     }
@@ -698,7 +696,6 @@ erDiagram
         string id_calificacion
         int rating
         string critico
-        int calificador
         string id_usuario
         string id_pelicula
     }
