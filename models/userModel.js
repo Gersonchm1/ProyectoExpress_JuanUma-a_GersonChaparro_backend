@@ -264,20 +264,35 @@ export class UserModelRatings{
     }
   }
 
-  async viewRating() {
-
-    
+  async viewRating(movieId) {
     const session = client.startSession();
     try {
       let result;
       await session.withTransaction(async () => {
-        result = await this.collection.find({}, { session }).toArray();
+        result = await this.collection.aggregate([
+          {
+            // Filtramos solo la película que nos interesa
+            $match: { _id: movieId }
+          },
+          {
+            // Calculamos el promedio y la cantidad de votos
+            $group: {
+              _id: "$_id",
+              avgRating: { $avg: "$rating" },
+              totalRatings: { $sum: 1 }
+            }
+          }
+        ], { session }).toArray();
       });
-      return result;
+  
+      // Si no encuentra nada, devolvemos null
+      return result.length > 0 ? result[0] : null;
     } finally {
       await session.endSession();
     }
   }
+  
+  
   // Funcion para ver las 20 peliculas mejor calificadas
   async topRatedMovies(limit = 20) {
   const session = client.startSession();
