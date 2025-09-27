@@ -31,11 +31,15 @@ router.get("/admin", checkRole("admin"), (req, res) => {
   res.json({ msg: "Bienvenido administrador", user: req.user });
 });
 
+// Que solo el admin pueda buscar usuario por id 
+router.get("/usuarios/:id", checkRole("admin"), UserController.findById);
+
 
 // ====================== Rutas Películas ======================
 router.get("/peliculas", MovieController.viewMovies);
 router.get("/peliculas/top", MovieController.topMovies);
 router.put("/peliculas/:id/views", MovieController.incrementViews);
+router.get("/peliculas/categoria/:id_genero", MovieController.viewByCategory);
 
 // ====================== Rutas Ratings ======================
 router.get("/ratings", RatingController.viewAll);

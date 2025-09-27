@@ -37,10 +37,10 @@ export class  UserController {
   
   static async login(req, res) {
     try {
-      const { email, contrasena } = req.body;
+      const { correo, contrasena } = req.body;
 
       // Llamada al modelo para validar usuario y generar token
-      const data = await userModel.loginUser({ email, password: contrasena });
+      const data = await userModel.loginUser({ correo, password: contrasena });
 
 
       // Si el rol es administrador pone un mensaje , sino , da el nombre
@@ -60,6 +60,25 @@ export class  UserController {
       res.status(500).json({ msg: "Error al iniciar sesión", error: error.message });
     }
   }
+
+  static async getById(req, res) {
+  try {
+    // revisa el object id de los parametros
+    const { id } = req.params;
+
+    // llama a la funcion del modelo para encontrar por el id
+    const user = await userModel.findUserById(id);
+
+    // sino lo encuentra , lanza usuario no encontrado
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+// devuelve la respuesta en json, y si hay algun error, notifica
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener usuario", error: error.message });
+  }
+}
 }
 
 // ###################################################################################################
@@ -109,7 +128,26 @@ export class MovieController {
       return res.status(500).json({ msg: "Error al incrementar vistas", error: error.message });
     }
   }
+
+  static async viewByCategory(req, res) {
+  try {
+    // iniciamos el modelo 
+    await movieModel.init();
+    // sacamos el id genero de los parametros
+    const { id_genero } = req.params;
+
+    // busca las peliculas por categoria llamando al modelo
+
+    const movies = await movieModel.viewMoviesByCategory(id_genero);
+
+      // devuelve la respuesta en json, si esta mal, lanza error
+    return res.json(movies);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error al obtener películas por género", error: error.message });
+  }
 }
+}
+
 
 // #############################################################################################################
 //                                               COMENTARIOS

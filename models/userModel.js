@@ -71,7 +71,23 @@ async incrementViews(movieId) {
     await session.endSession();
   }
 }
-
+async viewMoviesByCategory(categoryId) {
+  const session = client.startSession();
+  try {
+    let result;
+    // iniciamos la transaccion
+    await session.withTransaction(async () => {
+      // llamamos la coleccion y buscamos en la coleccion peliculas el id
+      result = await this.collection 
+        .find({ id_genero: categoryId }, { session })
+        .toArray();
+    });
+    // devuelve el resultado
+    return result;
+  } finally {
+    await session.endSession();
+  }
+}
 
 }
 
@@ -367,23 +383,7 @@ export class UserModelCategory{
       await session.endSession();
     }
   }
-    async viewCategoryByMovie(categoryId) {
-    const session = client.startSession();
-    try {
-      let result;
-      // iniciamos la transaccion
-      await session.withTransaction(async () => {
-        result = await this.collection
-        // encuentra la categoria por el id que recibe
-          .find({   id_genero: categoryId }, { session })
-          .toArray();
-      });
-      // devuelve la informacion 
-      return result;
-    } finally {
-      await session.endSession();
-    }
-  }
+
 
 }
 
