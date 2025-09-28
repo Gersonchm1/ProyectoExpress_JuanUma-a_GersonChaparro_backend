@@ -2,10 +2,13 @@ import express from "express";
 import passport from "passport";
 import rateLimit from "express-rate-limit"; 
 import { checkRole } from "../middleware/checkrole.js";
+import { addVersion } from "../middleware/version.js"; 
 
 import { UserController, MovieController, CommentController, RatingController } from "../controllers/userController.js";
 
 const router = express.Router();
+
+router.use(addVersion); 
 
 // Limita la cantidad de intentos de login 
 const loginLimiter = rateLimit({

@@ -5,6 +5,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
+import { addVersion } from "./middleware/version.js";
 
 // Configuración
 dotenv.config();
@@ -24,7 +25,9 @@ app.use(cors({
 }));
 
 // Parseo de JSON
-app.use(express.json()); 
+app.use(express.json());
+// añade la version en las respuestas 
+app.use(addVersion);
 
 // Passport
 import "./config/passport.js"; // inicializa estrategia JWT

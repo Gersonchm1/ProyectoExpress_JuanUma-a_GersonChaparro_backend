@@ -134,7 +134,7 @@ async UpdateMovie(data, movieId ) {
 
 
 
-export class AdminModelMovies {
+export class AdminModelCategory {
 
 constructor() {
     this.collection = null 

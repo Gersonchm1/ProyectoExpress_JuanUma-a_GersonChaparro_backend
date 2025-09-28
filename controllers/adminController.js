@@ -1,5 +1,5 @@
-import { AdminModelMovies } from "../models/adminModelMovies.js";
-import { AdminModelCategory } from "../models/adminModelCategory.js";
+import { AdminModelMovies, AdminModelCategory } from "../models/adminModel.js";
+
 
 // incializamos los modelos 
 const adminMovies = new AdminModelMovies();
