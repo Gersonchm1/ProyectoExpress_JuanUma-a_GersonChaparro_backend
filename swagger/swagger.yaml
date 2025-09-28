@@ -2,17 +2,33 @@ openapi: 3.0.3
 info:
   title: API de Películas, Ratings y Reseñas
   version: 1.0.0
-  description: Documentación de la API con usuarios, películas, ratings y reseñas.
+  description: Documentación completa de la API, diferenciando entre rutas para usuarios y administradores.
 
 servers:
   - url: http://localhost:3000/api
 
+tags:
+  - name: Usuarios
+    description: Operaciones de autenticación y gestión de perfiles de usuario.
+  - name: Películas (Usuario)
+    description: Endpoints para que los usuarios consulten información sobre películas.
+  - name: Reseñas y Ratings (Usuario)
+    description: Endpoints para que los usuarios gestionen reseñas y calificaciones.
+  - name: Películas (Admin)
+    description: Endpoints exclusivos para administradores para gestionar el catálogo de películas.
+  - name: Categorías (Admin)
+    description: Endpoints exclusivos para administradores para gestionar las categorías de películas.
+
 paths:
+  # ----------------------------------------------------------------
+  # --- RUTAS DE USUARIOS Y AUTENTICACIÓN ---
+  # ----------------------------------------------------------------
   /users/register:
     post:
       tags:
         - Usuarios
-      summary: Registro de usuario
+      summary: Registro de un nuevo usuario
+      description: Crea una cuenta de usuario con rol "user" por defecto.
       requestBody:
         required: true
         content:
@@ -22,23 +38,27 @@ paths:
               properties:
                 name:
                   type: string
+                  example: "Juan Pérez"
                 email:
                   type: string
+                  example: "juan.perez@example.com"
                 password:
                   type: string
+                  example: "password123"
               required:
                 - name
                 - email
                 - password
       responses:
         "201":
-          description: Usuario registrado exitosamente
+          description: Usuario registrado exitosamente.
 
   /users/login:
     post:
       tags:
         - Usuarios
       summary: Login de usuario
+      description: Autentica a un usuario y devuelve un token JWT. Si se usa la contraseña maestra de administrador, se asigna el rol "admin".
       requestBody:
         required: true
         content:
@@ -48,64 +68,70 @@ paths:
               properties:
                 email:
                   type: string
+                  example: "admin@example.com"
                 password:
                   type: string
+                  example: "admin_secret_key"
               required:
                 - email
                 - password
       responses:
         "200":
-          description: Login exitoso con JWT
+          description: Login exitoso. Devuelve el token JWT.
 
   /users/profile:
     get:
       tags:
         - Usuarios
       summary: Perfil del usuario autenticado
+      description: Devuelve la información del perfil del usuario que realiza la petición (requiere token).
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: Perfil del usuario autenticado
+          description: Perfil del usuario autenticado.
+        "401":
+          description: No autorizado (token inválido o no proporcionado).
 
   /users/admin:
     get:
       tags:
         - Usuarios
-      summary: Ruta exclusiva para administradores
+      summary: Ruta de prueba para administradores
+      description: Endpoint de prueba para verificar si un usuario tiene el rol de "admin".
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: Acceso permitido solo a admins
+          description: Acceso permitido. Eres administrador.
+        "401":
+          description: No autorizado.
+        "403":
+          description: Acceso denegado (no tienes el rol de admin).
 
+  # ----------------------------------------------------------------
+  # --- RUTAS DE PELÍCULAS (PARA USUARIOS) ---
+  # ----------------------------------------------------------------
   /peliculas:
     get:
       tags:
-        - Peliculas
+        - Películas (Usuario)
       summary: Listar todas las películas
-      parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            example: 20
-        - name: skip
-          in: query
-          required: false
-          schema:
-            type: integer
-            example: 0
+      description: Cualquier usuario autenticado puede ver la lista de todas las películas disponibles.
+      security:
+        - bearerAuth: []
       responses:
         "200":
-          description: Lista de películas
+          description: Lista de películas obtenida con éxito.
 
   /peliculas/top-rated:
     get:
       tags:
-        - Peliculas
-      summary: Listar películas con mejor rating promedio
+        - Películas (Usuario)
+      summary: Listar películas con mejor rating
+      description: Devuelve un listado de las películas mejor calificadas por los usuarios.
+      security:
+        - bearerAuth: []
       parameters:
         - name: limit
           in: query
@@ -113,15 +139,19 @@ paths:
           schema:
             type: integer
             example: 10
+          description: Número de películas a devolver.
       responses:
         "200":
-          description: Lista de películas con mejor rating
+          description: Lista de películas con mejor rating.
 
   /peliculas/top-viewed:
     get:
       tags:
-        - Peliculas
+        - Películas (Usuario)
       summary: Listar películas más vistas
+      description: Devuelve un listado de las películas más populares según el número de vistas.
+      security:
+        - bearerAuth: []
       parameters:
         - name: limit
           in: query
@@ -129,15 +159,20 @@ paths:
           schema:
             type: integer
             example: 10
+          description: Número de películas a devolver.
       responses:
         "200":
-          description: Lista de películas más vistas
+          description: Lista de películas más vistas.
 
+  # ----------------------------------------------------------------
+  # --- RUTAS DE RATINGS Y RESEÑAS (PARA USUARIOS) ---
+  # ----------------------------------------------------------------
   /ratings/{id_pelicula}:
     post:
       tags:
-        - Ratings
-      summary: Añadir rating a una película
+        - Reseñas y Ratings (Usuario)
+      summary: Añadir o actualizar rating a una película
+      description: Permite a un usuario autenticado dar una calificación (de 1 a 5) a una película específica.
       security:
         - bearerAuth: []
       parameters:
@@ -146,6 +181,7 @@ paths:
           required: true
           schema:
             type: string
+            example: "MOVX001"
       requestBody:
         required: true
         content:
@@ -157,31 +193,35 @@ paths:
                   type: integer
                   minimum: 1
                   maximum: 5
+                  example: 5
               required:
                 - rating
       responses:
         "201":
-          description: Rating añadido correctamente
+          description: Rating añadido/actualizado correctamente.
 
   /resenas/{id_pelicula}:
     get:
       tags:
-        - Reseñas
+        - Reseñas y Ratings (Usuario)
       summary: Listar reseñas de una película
+      description: Muestra todas las reseñas y comentarios para una película específica.
       parameters:
         - name: id_pelicula
           in: path
           required: true
           schema:
             type: string
+            example: "MOVX001"
       responses:
         "200":
-          description: Lista de reseñas
+          description: Lista de reseñas de la película.
 
     post:
       tags:
-        - Reseñas
+        - Reseñas y Ratings (Usuario)
       summary: Crear una reseña para una película
+      description: Permite a un usuario autenticado escribir una nueva reseña para una película.
       security:
         - bearerAuth: []
       parameters:
@@ -190,6 +230,7 @@ paths:
           required: true
           schema:
             type: string
+            example: "MOVX002"
       requestBody:
         required: true
         content:
@@ -199,21 +240,24 @@ paths:
               properties:
                 comentario:
                   type: string
+                  example: "¡Una película fantástica!"
                 calificacion:
                   type: integer
                   minimum: 1
                   maximum: 5
+                  example: 4
               required:
                 - comentario
       responses:
         "201":
-          description: Reseña creada exitosamente
+          description: Reseña creada exitosamente.
 
   /resenas/{id_resena}:
     put:
       tags:
-        - Reseñas
+        - Reseñas y Ratings (Usuario)
       summary: Actualizar una reseña existente
+      description: Permite al usuario que creó la reseña poder actualizarla.
       security:
         - bearerAuth: []
       parameters:
@@ -222,6 +266,7 @@ paths:
           required: true
           schema:
             type: string
+            example: "60c72b2f9b1d8c001f8e4c6a"
       requestBody:
         required: true
         content:
@@ -231,16 +276,19 @@ paths:
               properties:
                 comentario:
                   type: string
+                  example: "Cambié de opinión, no era tan buena."
                 calificacion:
                   type: integer
+                  example: 2
       responses:
         "200":
-          description: Reseña actualizada
+          description: Reseña actualizada correctamente.
 
     delete:
       tags:
-        - Reseñas
+        - Reseñas y Ratings (Usuario)
       summary: Eliminar una reseña
+      description: Permite al usuario que creó la reseña (o a un admin) eliminarla.
       security:
         - bearerAuth: []
       parameters:
@@ -249,23 +297,178 @@ paths:
           required: true
           schema:
             type: string
+            example: "60c72b2f9b1d8c001f8e4c6a"
       responses:
         "200":
-          description: Reseña eliminada
+          description: Reseña eliminada correctamente.
+
+  # ----------------------------------------------------------------
+  # --- RUTAS DE GESTIÓN DE PELÍCULAS (SOLO ADMIN) ---
+  # ----------------------------------------------------------------
+  /admin/peliculas:
+    post:
+      tags:
+        - Películas (Admin)
+      summary: Añadir una nueva película
+      description: Exclusivo para administradores. Permite agregar una nueva película al catálogo.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PeliculaInput'
+      responses:
+        "201":
+          description: Película agregada con éxito.
+        "403":
+          description: Acceso denegado.
+
+  /admin/peliculas/{id}:
+    put:
+      tags:
+        - Películas (Admin)
+      summary: Actualizar una película existente
+      description: Exclusivo para administradores. Permite modificar los datos de una película por su ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "MOVX015"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PeliculaInput'
+      responses:
+        "200":
+          description: Película actualizada con éxito.
+        "403":
+          description: Acceso denegado.
+
+    delete:
+      tags:
+        - Películas (Admin)
+      summary: Eliminar una película
+      description: Exclusivo para administradores. Elimina una película del catálogo por su ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "MOVX015"
+      responses:
+        "200":
+          description: Película eliminada con éxito.
+        "403":
+          description: Acceso denegado.
+
+  # ----------------------------------------------------------------
+  # --- RUTAS DE GESTIÓN DE CATEGORÍAS (SOLO ADMIN) ---
+  # ----------------------------------------------------------------
+  /admin/categorias:
+    post:
+      tags:
+        - Categorías (Admin)
+      summary: Añadir una nueva categoría
+      description: Exclusivo para administradores. Permite agregar una nueva categoría (género).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: "Ciencia Ficción"
+      responses:
+        "201":
+          description: Categoría agregada con éxito.
+        "403":
+          description: Acceso denegado.
+
+  /admin/categorias/{id_genero}:
+    put:
+      tags:
+        - Categorías (Admin)
+      summary: Actualizar una categoría existente
+      description: Exclusivo para administradores. Modifica el nombre de una categoría.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_genero
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: "Sci-Fi"
+      responses:
+        "200":
+          description: Categoría actualizada con éxito.
+        "403":
+          description: Acceso denegado.
+
+    delete:
+      tags:
+        - Categorías (Admin)
+      summary: Eliminar una categoría
+      description: Exclusivo para administradores. Elimina una categoría por su ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_genero
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 5
+      responses:
+        "200":
+          description: Categoría eliminada con éxito.
+        "403":
+          description: Acceso denegado.
 
 components:
+  schemas:
+    PeliculaInput:
+      type: object
+      properties:
+        titulo:
+          type: string
+          example: "Inception"
+        id_genero:
+          type: integer
+          example: 1
+        descripcion:
+          type: string
+          example: "Un ladrón que roba secretos corporativos a través del uso de la tecnología de compartir sueños..."
+        director:
+          type: string
+          example: "Christopher Nolan"
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  responses:
-    BadRequest:
-      description: Petición inválida
-    Unauthorized:
-      description: No autenticado
-    Forbidden:
-      description: Acceso denegado
-    NotFound:
-      description: No encontrado

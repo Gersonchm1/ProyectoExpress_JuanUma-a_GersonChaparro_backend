@@ -5,7 +5,9 @@ import passport from "passport";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "url"
+import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js"
 // Configuración
 dotenv.config();
 const app = express();
@@ -38,11 +40,11 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Rutas
-import userRoutes from "./routes/userRoutes.js";
+
 
 // Usamos prefijos
-app.use("/api/users", userRoutes);
+app.use("/api/v1", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // Ruta raíz
 app.get("/", (req, res) => {
