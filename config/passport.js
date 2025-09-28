@@ -1,12 +1,12 @@
 import passport from "passport";
-// Plugin para usar jwt, Importamos strategy que es un comando de passport con jwt
+//  Importamos strategy que es un comando de passport con jwt
 // lo renombramos y con extract luego se va a poder extraer la info de los tokens
 import { Strategy as JwtStrategy, ExtractJwt  } from "passport-jwt";
 import { UserModelRegister } from "../models/userModel.js";
 
 const userModel = new UserModelRegister();
 
-// serea la funcion para que se asegure de devolver una promesa
+// se crea la funcion para que se asegure de devolver  la respuesta
 (async () => {
     await userModel.init();
   })();
@@ -34,7 +34,7 @@ try{
     // verificamos
     const user = await userModel.findUserById(jwt_payload.id)
     // en el () hay dos vaores, null o error, para el apartado de errores 
-    // que es nulo, y devuelve el camper que encontro 
+    // que es nulo, y devuelve el usuario que encontro 
     if (user) return done (null, user)
 
     // Si no se encuentra, retorna false
