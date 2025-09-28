@@ -72,15 +72,20 @@ async incrementViews(movieId) {
   }
 }
 async viewMoviesByCategory(categoryId) {
+  await this.init();
+  return await this.collection
+    .find({ id_genero: Number(categoryId) })
+    .toArray();
+}
+
+async findMovieById(movieId) {
   const session = client.startSession();
   try {
     let result;
     // iniciamos la transaccion
     await session.withTransaction(async () => {
-      // llamamos la coleccion y buscamos en la coleccion peliculas el id
-      result = await this.collection 
-        .find({ id_genero: categoryId }, { session })
-        .toArray();
+      // busca el id de la pelicula 
+      result = await this.collection.findOne({ _id: movieId }, { session });
     });
     // devuelve el resultado
     return result;
@@ -88,6 +93,7 @@ async viewMoviesByCategory(categoryId) {
     await session.endSession();
   }
 }
+
 
 }
 
@@ -446,12 +452,12 @@ export class UserModelRegister {
   }
 
   // Login
-  async loginUser({ email, password }) {
+  async loginUser({ correo, password }) {
     await this.init(); // inicializar colección
 
 
     // Busca el usuario por el email , si no lo encuentra  sale error
-    const user = await this.collection.findOne({ email });
+    const user = await this.collection.findOne({ email: correo });
     if (!user) throw new Error("Usuario no encontrado");
 
     // definimos role
@@ -473,7 +479,7 @@ export class UserModelRegister {
 
       // Genera token JWT
   const token = jwt.sign(
-    { id: user._id, role: user.role },
+    { id: user._id, role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES }
   );

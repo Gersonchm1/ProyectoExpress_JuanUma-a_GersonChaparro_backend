@@ -134,11 +134,9 @@ export class MovieController {
     // iniciamos el modelo 
     await movieModel.init();
     // sacamos el id genero de los parametros
-    const { id_genero } = req.params;
+const { id_genero } = req.params;
+const movies = await movieModel.viewMoviesByCategory(Number(id_genero));
 
-    // busca las peliculas por categoria llamando al modelo
-
-    const movies = await movieModel.viewMoviesByCategory(id_genero);
 
       // devuelve la respuesta en json, si esta mal, lanza error
     return res.json(movies);
@@ -146,6 +144,30 @@ export class MovieController {
     return res.status(500).json({ msg: "Error al obtener películas por género", error: error.message });
   }
 }
+
+static async findById(req, res) {
+  try {
+
+    // recibe el id de los parametros
+    const { id } = req.params; 
+
+    // inicia el modelo 
+    await movieModel.init();
+
+    // llama a la funcion de encontrar pelicula por id, con el id que recibe
+    const movie = await movieModel.findMovieById(id);
+
+    // si no encuentra la pelicula, lanza , pelicula no encontrada
+    if (!movie) {
+      return res.status(404).json({ msg: "Película no encontrada" });
+    }
+// devuelve la respuesta en json y notifica si hubo error
+    res.json(movie);
+  } catch (err) {
+    res.status(500).json({ error: "Error al buscar la película", details: err.message });
+  }
+}
+
 }
 
 

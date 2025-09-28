@@ -1,31 +1,29 @@
-// app.js
 import express from "express";
 import dotenv from "dotenv";
 import passport from "passport";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "path";
-import { fileURLToPath } from "url"
-import userRoutes from "./routes/userRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js"
+import { fileURLToPath } from "url";
+
 // Configuración
 dotenv.config();
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-//  Servir la carpeta public
-app.use(express.static(path.join(__dirname, "public")));
+// Servir la carpeta public
+app.use(express.static(path.join(dirname, "public")));
 
-
-
-
+// Configuración CORS
 app.use(cors({
-  origin: "http://localhost:3000", 
+  origin: "http://localhost:3000/", 
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
+// Parseo de JSON
 app.use(express.json()); 
 
 // Passport
@@ -40,11 +38,13 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Rutas
+import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js"; // Rutas de admin
 
-
-// Usamos prefijos
-app.use("/api/v1", userRoutes);
-app.use("/api/v1/admin", adminRoutes);
+// Prefijos de rutas
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes); // Rutas de admin (películas y categorías)
 
 // Ruta raíz
 app.get("/", (req, res) => {
@@ -53,6 +53,8 @@ app.get("/", (req, res) => {
 
 // Puerto
 const PORT = process.env.PORT;
+
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

@@ -9,8 +9,8 @@ const router = express.Router();
 
 // Limita la cantidad de intentos de login 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, //por 15 minutos 20 intemtos
-  max: 20,
+  windowMs: 15 * 60 * 10000, //por 15 minutos 20 intemtos
+  max: 200,
   message: "Demasiados intentos de login desde esta IP, inténtalo más tarde.",
 });
 
@@ -32,7 +32,6 @@ router.get("/admin", checkRole("admin"), (req, res) => {
 });
 
 // Que solo el admin pueda buscar usuario por id 
-router.get("/usuarios/:id", checkRole("admin"), UserController.findById);
 
 
 // ====================== Rutas Películas ======================
@@ -40,6 +39,8 @@ router.get("/peliculas", MovieController.viewMovies);
 router.get("/peliculas/top", MovieController.topMovies);
 router.put("/peliculas/:id/views", MovieController.incrementViews);
 router.get("/peliculas/categoria/:id_genero", MovieController.viewByCategory);
+router.get("/peliculas/:id", MovieController.findById);
+
 
 // ====================== Rutas Ratings ======================
 router.get("/ratings", RatingController.viewAll);
