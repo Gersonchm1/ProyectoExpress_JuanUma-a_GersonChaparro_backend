@@ -31,7 +31,6 @@ router.post(
     body("titulo").notEmpty().withMessage("El título es obligatorio"),
     body("descripcion").notEmpty().withMessage("La descripción es obligatoria"),
     body("anio").isInt({ min: 1950 }).withMessage("El año debe ser un número válido"),
-    body("genero").notEmpty().withMessage("El género es obligatorio"),
   ],
   validate,
   AdminMovieController.add

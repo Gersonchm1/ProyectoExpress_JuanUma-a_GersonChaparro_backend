@@ -15,8 +15,8 @@ constructor() {
 
 // inicializamos la base de datos 
 async init() {
-    const db = connectDB();
-    this.collection = db.collection("pelicula")
+  const db = await connectDB(); 
+  this.collection = db.collection("pelicula");
 }
 
 async addMovies(data) {
@@ -80,23 +80,17 @@ async UpdateMovie(data, movieId ) {
       // Construir la reseña con IDs controlados en el backend
       const updateMovieData = {
         ...data,
-        _id: movieId,
         fecha: new Date()
       };
 
       // Insertar o actualizar (si ya existe una reseña del mismo usuario para esa película)
       result = await this.collection.updateOne(
-        {
-          _id: movieId,
-        },
-        
-    // actualiza la informacion necesaria
-
+        { _id: movieId }, // se busca el id a actulizar, no se modifica
         { $set: updateMovieData },
-
-    // si el documento existe, lo actualiza, sino , lo crea
-        { upsert: true, session }
+        { session }
       );
+        
+    
     });
 
     return result;
@@ -142,8 +136,8 @@ constructor() {
 
 // inicializamos la base de datos 
 async init() {
-    const db = connectDB();
-    this.collection = db.collection("genero")
+    const db = await connectDB(); 
+    this.collection = db.collection("genero");
 }
 
 // Añadir Categoria
@@ -193,7 +187,7 @@ async addCategory(data) {
   }
 }
 
-async UpdateCategory(data, categoryId ) {
+async UpdateCategory(data, id_categoria ) {
   const session = client.startSession();
   try {
     let result;
@@ -203,22 +197,19 @@ async UpdateCategory(data, categoryId ) {
       // se ponen los datos a cambiar
       const updateMovieData = {
         ...data,
-        _id: categoryId,
         fecha: new Date()
       };
 
       // Insertar o actualizar 
       result = await this.collection.updateOne(
-        {
-          _id: movieId,
-        },
-        
+        // especificamos, que el id genero de la coleccion es el de categoria
+        { id_genero: id_categoria },
+
     // actualiza la informacion necesaria
 
         { $set: updateMovieData },
 
-    // si el documento existe, lo actualiza, sino , lo crea
-        { upsert: true, session }
+  
       );
     });
 
@@ -229,7 +220,7 @@ async UpdateCategory(data, categoryId ) {
   }
 }
 
- async  deleteCategory(categoryId) {
+ async  deleteCategory(id_categoria) {
     const session = client.startSession();
     try {
       let total;
@@ -238,8 +229,9 @@ async UpdateCategory(data, categoryId ) {
         // Aqui, elimina de la coleccion las categoria, por su id
         // y crea la sesion
         total = await this.collection.deleteOne(
-          { _id: categoryId },
-          { session }
+        // especificamos, que el id genero de la coleccion es el de categoria
+     { id_genero: id_categoria },
+           { session }
         );
       });
       // devuelve la data
