@@ -486,9 +486,9 @@ export class UserModelRegister {
 
     // Retorna usuario y token juntos
     return {
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
-      token
-    };
+  user: { _id: user._id, name: user.name, email: user.email, role }, // <-- usar la variable role
+  token
+};
   }
   // Buscar usuario por ID
   async findUserById(userId) {

@@ -298,20 +298,21 @@ export class RatingController {
     }
   }
 
-  static async viewAll(req, res) {
-    try {
+static async viewAll(req, res) {
+  try {
+    await ratingModel.init();
 
-      // Iniciamos el modelo de rating
-      await ratingModel.init();
+    // recibimos  el id de los parametros
+    const { id_pelicula } = req.params;
 
-      // llamamos la funcion de ver ratings
-      const ratings = await ratingModel.viewRating();
-      return res.json(ratings);
-    } catch (error) {
-      return res.status(500).json({ msg: "Error al obtener ratings", error: error.message });
-    }
+    // Llamamos a la función del modelo pasando el id de la película
+    const ratings = await ratingModel.viewRating(id_pelicula);
+
+    return res.json(ratings);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error al obtener ratings de la película", error: error.message });
   }
-
+}
   static async topRated(req, res) {
     try {
       // Iniciamos el modelo e rating

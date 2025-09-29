@@ -46,7 +46,7 @@ router.get("/peliculas/:id", MovieController.findById);
 
 
 // ====================== Rutas Ratings ======================
-router.get("/ratings", RatingController.viewAll);
+router.get("/ratings/:id_pelicula", RatingController.viewAll);
 router.post("/ratings/:id_pelicula/:id_usuario", RatingController.add);
 router.get("/ratings/top", RatingController.topRated);
 
