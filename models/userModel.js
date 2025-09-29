@@ -294,8 +294,7 @@ export class UserModelRatings{
         result = await this.collection.aggregate([
           {
             // Filtramos solo la película que nos interesa
-            $match: { _id: movieId }
-          },
+          $match: { id_pelicula: movieId }          },
           {
             // Calculamos el promedio y la cantidad de votos
             $group: {
