@@ -194,7 +194,7 @@ async addComment(data, movieId, userId) {
     }
   }
 
- async deleteComment(userId, movieId, commentId) {
+ async deleteComments(userId, movieId, commentId) {
   const session = client.startSession();
   try {
     let result;

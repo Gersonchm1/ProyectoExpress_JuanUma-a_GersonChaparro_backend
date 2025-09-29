@@ -240,22 +240,27 @@ export class CommentController {
     }
   }
 
-  static async deleteByMovie(req, res) {
-    try {
-      // iniciamos el modelo
-      await commentModel.init();
+static async deleteByMovie(req, res) {
+  try {
+    // Inicializamos el modelo
+    await commentModel.init();
 
-      // tomamos el id de la pelicula 
-      const { id_pelicula } = req.params;
+    // Sacamos los parámetros de la ruta
+    const { id_usuario, id_pelicula, id_comentario } = req.params;
 
-      // luego lama a la funcion de eliminarcomentarios de la pelicula
-      const result = await commentModel.deleteComments(id_pelicula);
-      // devuelve un json con la informacion eliminada , sino, lanza error
-      return res.json({ msg: "Comentarios eliminados", result });
-    } catch (error) {
-      return res.status(500).json({ msg: "Error al eliminar comentarios", error: error.message });
+    // Llamamos a la función del modelo con los 3 parámetros
+    const result = await commentModel.deleteComments(id_usuario, id_pelicula, id_comentario);
+
+    // Devolvemos la respuesta , si el no se encuentraa comentario lanza eroro
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ msg: "No se encontró el comentario para eliminar" });
     }
+
+    return res.json({ msg: "Comentario eliminado", result });
+  } catch (error) {
+    return res.status(500).json({ msg: "Error al eliminar comentario", error: error.message });
   }
+}
 
   static async update(req, res) {
     try {

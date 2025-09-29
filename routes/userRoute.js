@@ -55,7 +55,7 @@ router.get("/resenas", CommentController.viewAll);
 router.get("/resenas/:id_pelicula", CommentController.viewByMovie);
 router.post("/resenas/:id_pelicula/:id_usuario", CommentController.add);
 router.put("/resenas/:id_pelicula/:id_usuario", CommentController.update);
-router.delete("/resenas/:id_pelicula", CommentController.deleteByMovie);
+router.delete("/resenas/:id_usuario/:id_pelicula/:id_comentario", CommentController.deleteByMovie);
 router.get("/resenas/:id_pelicula/count", CommentController.countByMovie);
 
 export default router;
