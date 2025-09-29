@@ -104,7 +104,7 @@ export class UserModelComments {
 
   async init() {
     const db = await connectDB();
-    this.collection = db.collection("comentario");
+    this.collection = db.collection("resena");
   }
 
   // Ver todos los comentarios
@@ -123,21 +123,20 @@ export class UserModelComments {
   }
 
   // Ver comentarios de una película
-  async viewCommentByMovie(movieId) {
-    const session = client.startSession();
-    try {
-      let result;
-      await session.withTransaction(async () => {
-        result = await this.collection
-        // encuentra la pelicula por el id que recibe
-          .find({ _id:movieId}, { session })
-          .toArray();
-      });
-      return result;
-    } finally {
-      await session.endSession();
-    }
+ async viewCommentByMovie(movieId) {
+  const session = client.startSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      result = await this.collection
+        .find({ id_pelicula: movieId }, { session }) 
+        .toArray();
+    });
+    return result;
+  } finally {
+    await session.endSession();
   }
+}
 
  // Añadir comentario ligado a una película y aumentar contador
 async addComment(data, movieId, userId) {
@@ -145,12 +144,15 @@ async addComment(data, movieId, userId) {
   try {
     let result;
     await session.withTransaction(async () => {
-      const newComment = {
+
+            const newComment = {
         ...data,
-        _id: movieId, // referencia a la película
+        id_pelicula: movieId, // referencia a la película
         id_usuario: userId,   // referencia al usuario
         fecha: new Date(),
       };
+
+
 
       // Insertar el comentario en la colección "comentario"
       result = await this.collection.insertOne(newComment, { session });
@@ -182,7 +184,7 @@ async addComment(data, movieId, userId) {
       await session.withTransaction(async () => {
         // Aqui cuenta la cantidad de documentos que hay en mongo db, osea comentarios
         total = await this.collection.countDocuments(
-          { _id: movieId },
+            { id_pelicula: movieId },
           { session }
         );
       });
@@ -192,49 +194,54 @@ async addComment(data, movieId, userId) {
     }
   }
 
-   async  deleteComments(movieId) {
-    const session = client.startSession();
-    try {
-      let total;
-      await session.withTransaction(async () => {
-        // Aqui, elimina de la coleccion los cmentarios con el id de la pelicula ingresado 
-        // y crea la sesion
-        total = await this.collection.deleteOne(
-          { _id: movieId },
-          { session }
-        );
-      });
-      return total;
-    } finally {
-      await session.endSession();
-    }
+ async deleteComment(userId, movieId, commentId) {
+  const session = client.startSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      result = await this.collection.deleteOne(
+        {
+          id_usuario: userId,       // referencia al usuario
+          id_pelicula: movieId,     // referencia a la película
+          id_comentario: commentId  // id del comentario específico
+        },
+        { session }
+      );
+    });
+    return result;
+  } finally {
+    await session.endSession();
   }
+}
 
  // Dentro de tu modelo de reseñas
-async UpdateComments(data, movieId, userId) {
+async UpdateComments(data, movieId, userId, commentId ) {
   const session = client.startSession();
   try {
     let result;
     await session.withTransaction(async () => {
       // Se ponen los datos a actualizar
-      const reviewData = {
+       const reviewData = {
         ...data,
         id_usuario: userId,
-        _id: movieId,
-        fecha: new Date()
+        id_pelicula: movieId,
+        id_comentario: commentId,
+        fecha: new Date() 
       };
 
       // Insertar o actualizar (si ya existe una reseña del mismo usuario para esa película)
       result = await this.collection.updateOne(
-        {
-          id_usuario:  userId,
-          _id: movieId,
+        // busca que documento actualizar
+               {
+          id_usuario: userId,
+          id_pelicula: movieId,
+          id_comentario: commentId
         },
 
         // actualiza la informacion necesaria
         { $set: reviewData },
-        // si el documento existe, lo actualiza, sino , lo crea
-        { upsert: true, session }
+        // si el documento existe, lo actualiza, sino , lanza error
+        { upsert: false, session }
       );
     });
 
