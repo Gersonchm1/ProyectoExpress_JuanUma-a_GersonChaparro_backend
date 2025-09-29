@@ -109,32 +109,7 @@ npm start
 
 2. **Probar rutas**
 
-* **Usuarios:**
-
-  * `POST /api/v1/users/register` → Registro de usuario
-  * `POST /api/v1/users/login` → Login de usuario
-  * `GET /api/v1/users/profile` → Perfil del usuario (requiere JWT)
-
-* **Admin:**
-
-  * `GET /api/v1/admin/dashboard` → Solo admins (requiere JWT y rol admin)
-
-* **Películas:**
-
-  * `GET /api/v1/peliculas` → Listar todas
-  * `GET /api/v1/peliculas/top-rated` → Mejor rating
-  * `GET /api/v1/peliculas/top-viewed` → Más vistas
-
-* **Ratings:**
-
-  * `POST /api/v1/ratings/{id_pelicula}` → Añadir rating (JWT requerido)
-
-* **Reseñas:**
-
-  * `GET /api/v1/resenas/{id_pelicula}` → Listar reseñas
-  * `POST /api/v1/resenas/{id_pelicula}` → Crear reseña (JWT requerido)
-  * `PUT /api/v1/resenas/{id_resena}` → Actualizar reseña (JWT requerido)
-  * `DELETE /api/v1/resenas/{id_resena}` → Eliminar reseña (JWT requerido)
+- revisando la documentacion en swagger
 
 > 💡 Todas las rutas protegidas requieren enviar en el header:
 
@@ -165,29 +140,14 @@ Authorization: Bearer <tu_token_jwt>
 }
 ```
 
-* **Crear reseña:**
 
-```json
-{
-  "comentario": "Excelente película",
-  "calificacion": 5
-}
-```
-
-* **Añadir rating:**
-
-```json
-{
-  "rating": 4
-}
-```
-
----
-
-## 🧪 Probar con Postman o Swagger
+## 🧪 Probar con Postman, Swagger o Imsomnia
 
 1. **Postman:** importar endpoints y probar con JSON en body y JWT en headers.
 2. **Swagger UI:**
+
+
+2. **Imsomnia:** importar endpoints y probar con JSON en body y JWT en headers.
 
 * Usa  YAML OpenAPI 
 
@@ -198,18 +158,19 @@ Authorization: Bearer <tu_token_jwt>
 * **JWT Secret:** Debe ser seguro y secreto.
 * **Roles:** Solo usuarios con rol `admin` pueden acceder a rutas de admin.
 * **MongoDB:** Si usas Atlas, permite tu IP en la whitelist.
-* **Versionado de API:** Todas las rutas usan `/api/v1/...` para permitir futuras versiones sin romper clientes.
+* **Versionado de API:** Todas las rutas usan semver para mostrar la version.
 
 ---
 
 ## 📝 Comandos útiles
 
 ```bash
-# Levantar servidor en desarrollo (reinicio automático)
-npm run dev
 
-# Levantar servidor en producción
+# Levantar servidor para empezar a usarlo
 npm start
+
+# Instalar las dependencias disponibles
+npm i
 
 # Instalar nuevas dependencias
 npm install <nombre_paquete>
@@ -221,4 +182,111 @@ npm update
 
 # Estructura del proyecto
 
+## Config
+
+- db.js # Contiene la informacion de la db
+
+- passsport # Contiene la logica de passport
+
+
+
+## Controllers
+
+- adminController.js # controlador de funciones admin
+
+
+- userController.js # controlador de funciones usuario 
+
+## middleware
+
+- checkrole.js # middleware, para revisar el role
+
+- version.js $ middleware  para poner version
+
+## models
+
+- adminModel.js # modelo de funciones para admin
+
+- userModel.js # modelo de funciones para usuario
+
+## routes
+
+- adminRoute.js # modelo de rutas para acceder como admin
+
+- userRoute.js # mdelo de rutas para acceder como usuario y admin
+
+## swagger
+
+- swagger.yaml # documentacion con openapi
+
 # Principios 
+
+##  Principios Aplicados (SOLID) en este Proyecto
+
+En este proyecto, la estructura se basa en **controladores separados por rol** (`UserController` y `AdminController`) y cada uno maneja las entidades (`Movie`, `Comment`, `Rating`, `Genre`) según lo que el rol puede hacer. Esto permite aplicar SOLID de manera organizada y clara.
+
+---
+
+###  Single Responsibility Principle (SRP)
+- Cada **controlador** tiene una única responsabilidad:
+  - `UserController` → Funciones disponibles para usuarios regulares: consultar películas, añadir comentarios y calificaciones.
+  - `AdminController` → Funciones exclusivas de administrador: crear, actualizar y eliminar películas, comentarios y géneros.
+- Cada **modelo** interactúa solo con su colección correspondiente (`pelicula`, `comentario`, `calificacion`, `genero`, `usuario`).
+
+---
+
+###  Open/Closed Principle (OCP)
+- Los controladores están **cerrados a modificaciones** pero abiertos a extensiones:
+  - Se pueden agregar nuevas funcionalidades en admin o usuario sin alterar la lógica existente.
+  - Ejemplo: se puede agregar `updateGenre` en admin sin modificar las funciones de usuario.
+
+---
+
+###  Liskov Substitution Principle (LSP)
+- Las funciones comunes como consultar películas (`viewMovies`), comentarios o ratings pueden ser usadas por ambos roles sin romper la funcionalidad.
+- Los métodos exclusivos de admin solo se ejecutan si el rol es `admin`.
+
+---
+
+###  Interface Segregation Principle (ISP)
+- Los métodos y endpoints están **segmentados por rol**:
+  - **Usuario:** consultar películas, añadir comentarios y ratings.
+  - **Administrador:** crear, actualizar y eliminar películas, comentarios y géneros.
+- Cada rol solo accede a lo que le corresponde, evitando “interfaces grandes” que incluyan funcionalidades innecesarias.
+
+---
+
+###  Dependency Inversion Principle (DIP)
+- Los controladores dependen de **modelos abstractos** (`UserModelMovie`, `UserModelComments`, etc.) en lugar de manipular directamente la base de datos.
+- Esto permite cambiar la implementación de la DB sin afectar la lógica de negocio.
+- La verificación de roles y permisos se maneja a través de **middleware**, manteniendo separación de responsabilidades.
+
+---
+
+###  Beneficios de esta estructura
+- Código modular y fácil de mantener.
+- Roles claros y bien definidos: Usuario vs Administrador.
+- Entidades centralizadas (`Movie`, `Comment`, `Rating`, `Genre`) controladas desde los controladores según permisos.
+- Escalable y seguro: nuevas funcionalidades pueden añadirse sin afectar la estructura existente.
+
+## ⚙️ Consideraciones Técnicas
+
+- El proyecto está construido con **Node.js** y **Express**.
+- Se utiliza **MongoDB** como base de datos NoSQL.
+- La arquitectura sigue el patrón **MVC** (Model-View-Controller).
+- La lógica de negocio se separa por roles: **usuario** y **administrador**.
+- Se implementa autenticación con **JWT** y control de permisos por roles.
+- Los controladores manejan entidades como **películas, comentarios, calificaciones y géneros**.
+- Todas las rutas están versionadas con  `semver`.
+- Se utiliza **sessions** y **transactions** de MongoDB para operaciones críticas.
+
+## Créditos
+
+Juan Fernando Umaña 
+
+Gerson Chaparro
+
+
+## Link al front-end
+
+https://github.com/Gersonchm1/ProyectoExpress_JuanUma-a_GersonChaparro_Frontend

@@ -42,8 +42,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Rutas
-import userRoutes from "./routes/userRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js"; // Rutas de admin
+import userRoutes from "./routes/userRoute.js";
+import adminRoutes from "./routes/adminRoute.js"; // Rutas de admin
 
 // Prefijos de rutas
 app.use("/api/users", userRoutes);
