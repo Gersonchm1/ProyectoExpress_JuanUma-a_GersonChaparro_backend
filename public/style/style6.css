@@ -1,0 +1,312 @@
+body {
+  background: #101012;
+  color: #f8f9fa;
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.conteiner1 {
+  background: rgba(24, 24, 28, 0.88);
+  border-radius: 18px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.26), 0 1.5px 0px #222;
+  max-width: 420px;
+  margin: 3.5rem auto 2rem auto;
+  padding: 32px 32px 38px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.conteiner1 h1 {
+  font-size: 2.2rem;
+  color: #ffd700;
+  margin-bottom: 16px;
+  text-align: center;
+  font-family: 'InterExtraBold', Arial, sans-serif;
+  letter-spacing: 1px;
+}
+
+.conteiner1 img {
+  display: block;
+  margin: 0 auto 18px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 32px #0008;
+  width: 290px;
+  max-width: 95vw;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.conteiner1 p {
+  font-size: 1.05rem;
+  color: #e3e3e3;
+  margin: 7px 0 0 0;
+  text-align: left;
+  width: 100%;
+}
+
+strong {
+  color: #ffb347;
+}
+
+.like, .dislike {
+  width: 42px;
+  height: 42px;
+  margin: 12px 7px 0 7px;
+  filter: drop-shadow(0 0 8px #fff3);
+  cursor: pointer;
+  transition: transform 0.13s;
+}
+.like:hover, .dislike:hover {
+  transform: scale(1.12) rotate(-8deg);
+}
+
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  margin: 12px 0 22px 0;
+}
+.rating input[type="radio"] {
+  display: none;
+}
+.rating label {
+  font-size: 2.1rem;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.18s;
+  padding: 0 4px;
+}
+.rating input:checked ~ label,
+.rating label:hover,
+.rating label:hover ~ label {
+  color: #ffd700;
+}
+
+.btn, .btn2 {
+  background: linear-gradient(90deg, #7b39ff 60%, #fa7f08 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-family: 'InterBold', Arial, sans-serif;
+  padding: 12px 28px;
+  margin: 16px 9px 0 9px;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.16s, transform 0.17s;
+  box-shadow: 0 3px 12px #0006;
+}
+.btn2 {
+  background: linear-gradient(90deg, #22c1c3 60%, #fd6e49 100%);
+}
+.btn:hover, .btn2:hover {
+  background: linear-gradient(90deg, #fa7f08 70%, #7b39ff 100%);
+  box-shadow: 0 6px 24px #fff2;
+  transform: scale(1.04);
+}
+
+.ahora, .trailer {
+  color: inherit;
+  background: none;
+  border: none;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  letter-spacing: 1px;
+}
+
+.reseñas {
+  font-size: 1.2rem;
+  color: #ffd700;
+  margin-top: 2.1rem;
+  margin-bottom: 1.2rem;
+  letter-spacing: 1px;
+  text-align: left;
+  font-family: 'InterBold', Arial, sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .conteiner1 {
+    padding: 12px 7vw 18px 7vw;
+    max-width: 98vw;
+    margin-top: 1.6rem;
+  }
+  .conteiner1 img {
+    width: 98vw;
+    max-width: 98vw;
+    height: auto;
+    max-height: 60vw;
+  }
+  .btn, .btn2 {
+    padding: 10px 5vw;
+    font-size: 1rem;
+  }
+}
+.reseñas-lista {
+  margin-top: 32px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 0 4px;
+}
+
+.reseña-card {
+  background: linear-gradient(120deg, #1a1a25 72%, #2c2333 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0007, 0 2px 0px #332266;
+  padding: 22px 24px 14px 24px;
+  position: relative;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.reseña-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 32px #7b39ff33, 0 2px 8px #222;
+}
+
+.reseña-card h3 {
+  color: #ffb347;
+  font-size: 1.17rem;
+  margin: 0 0 5px 0;
+  font-family: 'InterBold', Arial, sans-serif;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px #2222;
+}
+
+.reseña-card p {
+  color: #f2f2f2;
+  font-size: 1.07rem;
+  margin: 0 0 18px 0;
+  line-height: 1.5;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+.reseña-extras {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 1.03rem;
+  margin-top: 0;
+}
+
+.reseña-likes, .reseña-dislikes {
+  display: flex;
+  align-items: center;
+  font-size: 1.12rem;
+  font-family: 'InterBold', Arial, sans-serif;
+  padding: 2px 10px 2px 6px;
+  border-radius: 40px;
+  background: #1e1e2e;
+  box-shadow: 0 2px 6px #0003;
+}
+.reseña-likes {
+  color: #ffe066;
+  border: 1px solid #ffe06655;
+}
+.reseña-dislikes {
+  color: #fc5c5c;
+  border: 1px solid #fc5c5c55;
+}
+
+.reseña-fecha {
+  color: #aaa;
+  font-size: 0.98rem;
+  margin-left: auto;
+  background: #262635;
+  border-radius: 16px;
+  padding: 2px 14px;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 600px) {
+  .reseña-card {
+    padding: 13px 8vw 7px 8vw;
+  }
+  .reseña-extras {
+    gap: 15px;
+    font-size: 0.98rem;
+  }
+}
+#rating-promedio {
+  margin: 18px 0 10px 0;
+  text-align: center;
+}
+.rating-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.17rem;
+  margin-bottom: 3px;
+}
+.estrellas {
+  color: #ffd700;
+  font-size: 1.45em;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 4px #0005;
+}
+.promedio-num {
+  color: #ffb347;
+  font-weight: bold;
+  margin-left: 7px;
+  font-size: 1.22em;
+}
+.total-votos {
+  color: #ccc;
+  font-size: 1em;
+  margin-left: 7px;
+}
+#form-reseña {
+  background: #17181a;
+  border-radius: 12px;
+  margin: 25px 0 18px 0;
+  padding: 16px 18px 8px 18px;
+  box-shadow: 0 2px 10px #0002;
+}
+#form-reseña h3 {
+  margin: 0 0 6px 0;
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+#form-reseña input, #form-reseña textarea {
+  width: 100%;
+  margin-bottom: 9px;
+  border-radius: 7px;
+  border: 1px solid #333;
+  background: #202024;
+  color: #fff;
+  padding: 7px;
+  font-size: 1em;
+  resize: none;
+}
+#form-reseña button {
+  background: linear-gradient(90deg,#7b39ff 60%,#fa7f08 100%);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 20px;
+  font-size: 1.07em;
+  cursor: pointer;
+  font-family: 'InterBold',Arial,sans-serif;
+  transition: background 0.16s, box-shadow 0.14s;
+  box-shadow: 0 2px 9px #0002;
+}
+.btn-editar-reseña, .btn-eliminar-reseña {
+  margin-left: 8px;
+  background: #222;
+  color: #ffd700;
+  border: 1px solid #ffd70044;
+  border-radius: 5px;
+  font-size: 0.97em;
+  padding: 2px 10px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.btn-eliminar-reseña {
+  color: #fc5c5c;
+  border-color: #fc5c5c55;
+}
+.btn-editar-reseña:hover { background: #333;}
+.btn-eliminar-reseña:hover { background: #400;}

@@ -312,12 +312,54 @@ export class UserModelRatings{
           }
         ], { session }).toArray();
       });
+      const saveCsv = async (customers) => {
+        const token = await getAccessTokenSilently();
+        try {
+            const response = await fetch('/api/SaveCSV', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "content-type": 'application/json; Charset=UTF-8'
+                },
+                body: JSON.stringify(customers)
+            })
+            const responseData = await response.json()
+            console.log(responseData)
+        } catch (error) {
+            console.log(error)
+        }
+    }
   
       // Si no encuentra nada, devolvemos null
       return result.length > 0 ? result[0] : null;
     } finally {
       await session.endSession();
     }
+  }
+  async viewRatingsend(movieId) {
+    
+   
+      const saveCsv = async (customers) => {
+        const token = await getAccessTokenSilently();
+        try {
+            const response = await fetch('/api/SaveCSV', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "content-type": 'application/json; Charset=UTF-8'
+                },
+                body: JSON.stringify(customers)
+            })
+            const responseData = await response.json()
+            console.log(responseData)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+  
+      // Si no encuentra nada, devolvemos null
+      return result.length > 0 ? result[0] : null;
+    } 
   }
   
   
@@ -452,6 +494,30 @@ export class UserModelRegister {
       return newUser;
     } catch (err) {
       throw new Error("Error en registro: " + err.message);
+    } finally {
+      await session.endSession();
+    }
+  }
+  // ver comentario por pelicula 
+  async viewCommentByMovie(movieId) {
+    const session = client.startSession();
+    try {
+      let result;
+      await session.withTransaction(async () => {
+        result = await this.collection
+          .find({ id_pelicula: movieId }, { session }) 
+          .toArray();
+      });
+      const saveCsv = (resenas) => {
+        const csv = JSONToCSV(resenas, {result})
+        
+        const link = document.createElement('a')
+        link.href = 'data:text/csv,' + encodeURIComponent(csv)
+        link.download = 'resenas.csv'
+        
+      }
+      
+      return result;
     } finally {
       await session.endSession();
     }

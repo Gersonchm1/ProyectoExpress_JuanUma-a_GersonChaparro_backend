@@ -261,6 +261,24 @@ static async deleteByMovie(req, res) {
     return res.status(500).json({ msg: "Error al eliminar comentario", error: error.message });
   }
 }
+static async viewByMovie(req, res) {
+  try {
+    // inicia el modelo de comentarios
+    await commentModel.init();
+
+    // saca el id de la pelicula de los parametros
+    const { id_pelicula } = req.params;
+
+    // Luego , llama a la funcion de ver comentarios por pelicula, tomando el id como referencia
+    const comments = await commentModel.viewCommentByMovie(id_pelicula);
+
+    // Devuelve la resuesta en json, y lnza si hay error
+    return res.json(comments);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error al obtener comentarios por película", error: error.message });
+  }
+}
+
 
   static async update(req, res) {
     try {
@@ -334,3 +352,5 @@ static async viewAll(req, res) {
     }
   }
 }
+
+

@@ -1,0 +1,262 @@
+body{
+  background-color: black;
+}
+@font-face {
+  font-family: 'InterExtraBold';
+  src: url('../fonts/Arvo-Regular.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+.logo{
+  width: 6%;
+  height: 10%;
+  border-radius: 50px;
+}
+.p1{
+  color: inherit;          /* hereda el color del texto normal */
+text-decoration: none;   /* quita el subrayado */
+cursor: pointer;         /* sigue mostrando la mano al pasar */
+margin: -5% 0vh 0vh 18vh;
+color: white;
+position: absolute;
+font-size: 4ch;
+z-index: 2;
+font-family: 'InterExtraBold', sans-serif;
+
+}
+.p2{
+  color: inherit;          /* hereda el color del texto normal */
+text-decoration: none;   /* quita el subrayado */
+cursor: pointer;         /* sigue mostrando la mano al pasar */
+margin: -5% 0vh 0vh 26%;
+color: white;
+position: absolute;
+font-size: 4ch;
+z-index: 2;
+font-family: 'InterExtraBold', sans-serif;
+}
+.po3{
+  color: inherit;          /* hereda el color del texto normal */
+text-decoration: none;   /* quita el subrayado */
+cursor: pointer;         /* sigue mostrando la mano al pasar */
+margin: -5% 0vh 0vh 38%;
+color: white;
+position: absolute;
+font-size: 4ch;
+z-index: 2;
+font-family: 'InterExtraBold', sans-serif;
+}
+.p4{
+  color: inherit;          /* hereda el color del texto normal */
+text-decoration: none;   /* quita el subrayado */
+cursor: pointer;         /* sigue mostrando la mano al pasar */
+margin: -5% 0vh 0vh 63%;
+color: white;
+position: absolute;
+font-size: 4ch;
+z-index: 2;
+ font-family: 'InterExtraBold', sans-serif;
+}
+.buscar{
+  width: 2%;
+  margin: -4.7% 0% 0% 82%;
+  position: absolute;
+  z-index: 2;
+}
+
+.icono-img{
+  width: 2.9%;
+  border-radius: 80px;
+  margin: -3.2% 0% 0% 93%;
+  position: absolute;
+  z-index: 2;
+  border: 1.5px solid rgb(219, 210, 210);
+
+}
+.letras{
+  font-size:4.5ch;
+  color: white;
+  margin: 0% 0vh 0vh 24%;
+  font-family: 'InterExtraBold', sans-serif;
+}
+.letras2{
+  color : white;
+  font-size: 4.5ch;
+  margin: 0vh 0vh 0vh 32%;
+  font-family: 'InterExtraBold', sans-serif;
+}
+.marvel {
+width: 10%;
+height: 10%;
+margin: 2% 0 0 5%;
+display: inline-block;
+background: linear-gradient(180deg, #1a2a6c, #3f58a8);
+color: #fff;
+font-family: Arial, sans-serif;
+font-weight: bold;
+text-align: center;
+padding: 35px 10px;
+border-radius: 32px;
+cursor: pointer;
+transition: all 0.3s ease;
+
+/* Sombras más visibles sobre fondo negro */
+box-shadow: 
+  0 6px 12px rgba(0, 0, 0, 0.8),
+  0 12px 24px rgba(0, 0, 0, 0.6),
+  0 0 20px rgba(63, 88, 168, 0.6);
+}
+
+.marvel:hover {
+transform: translateY(-5px) scale(1.05);
+box-shadow: 
+  0 8px 16px rgba(0, 0, 0, 0.9),
+  0 16px 32px rgba(0, 0, 0, 0.7),
+  0 0 35px rgba(63, 88, 168, 0.9);
+}
+
+.pixar{
+width: 10%;
+height: 10%;
+margin: 2% 0vh 0vh 12% ;
+display: inline-block;
+background: linear-gradient(180deg, #1a2a6c, #3f58a8); /* Degradado de azul oscuro a azul más claro */
+color: #fff;
+font-family: Arial, sans-serif;
+font-weight: bold;
+text-align: center;
+padding: 9px 10px;
+border-radius: 32px; /* Esquinas redondeadas */
+cursor: pointer;
+transition: all 0.3s ease;
+
+/* Sombra suave */
+box-shadow: 
+  0 4px 10px rgba(26, 42, 108, 0.4),
+  0 8px 20px rgba(63, 88, 168, 0.3);
+}
+
+/* Efecto al pasar el mouse */
+.card:hover {
+transform: scale(1.05);
+box-shadow: 
+  0 6px 12px rgba(0, 0, 0, 0.6),
+  0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.disney{
+width: 10%;
+height: 10%;
+margin: 2% 0vh 0vh 5% ;
+display: inline-block;
+background: linear-gradient(180deg, #1a2a6c, #3f58a8); /* Degradado de azul oscuro a azul más claro */
+color: #fff;
+font-family: Arial, sans-serif;
+font-weight: bold;
+text-align: center;
+padding: 3px 10px;
+border-radius: 32px; /* Esquinas redondeadas */
+cursor: pointer;
+transition: all 0.3s ease;
+
+/* Sombra suave */
+box-shadow: 
+  0 4px 10px rgba(26, 42, 108, 0.4),
+  0 8px 20px rgba(63, 88, 168, 0.3);
+}
+
+/* Efecto al pasar el mouse */
+.card:hover {
+transform: scale(1.05);
+box-shadow: 
+  0 6px 12px rgba(0, 0, 0, 0.6),
+  0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.netflix{
+width: 10%;
+height: 10%;
+margin: 2% 0vh 0vh 5% ;
+display: inline-block;
+background: linear-gradient(180deg, #1a2a6c, #3f58a8); /* Degradado de azul oscuro a azul más claro */
+color: #fff;
+font-family: Arial, sans-serif;
+font-weight: bold;
+text-align: center;
+padding: 10px 10px;
+border-radius: 32px; /* Esquinas redondeadas */
+cursor: pointer;
+transition: all 0.3s ease;
+
+/* Sombra suave */
+box-shadow: 
+  0 4px 10px rgba(26, 42, 108, 0.4),
+  0 8px 20px rgba(63, 88, 168, 0.3);
+}
+
+/* Efecto al pasar el mouse */
+.card:hover {
+transform: scale(1.05);
+box-shadow: 
+  0 6px 12px rgba(0, 0, 0, 0.6),
+  0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.star{
+width: 10%;
+height: 10%;
+margin: 0vh 0vh 0vh 5% ;
+display: inline-block;
+background: linear-gradient(180deg, #1a2a6c, #3f58a8); /* Degradado de azul oscuro a azul más claro */
+color: #fff;
+font-family: Arial, sans-serif;
+font-weight: bold;
+text-align: center;
+padding: 2px 10px;
+border-radius: 32px; /* Esquinas redondeadas */
+cursor: pointer;
+transition: all 0.3s ease;
+
+/* Sombra suave */
+box-shadow: 
+  0 4px 10px rgba(26, 42, 108, 0.4),
+  0 8px 20px rgba(63, 88, 168, 0.3);
+}
+
+/* Efecto al pasar el mouse */
+.card:hover {
+transform: scale(1.05);
+box-shadow: 
+  0 6px 12px rgba(0, 0, 0, 0.6),
+  0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.drama{
+  color: white;
+  font-size: 6ch;
+  margin: 1.5vh 0vh 0vh 1%  ;
+}
+.cuadrado {
+  width: 80%;
+  height: 20%;
+  margin: -23.5% 0 0 8%;
+  padding: 3.5vh;
+  color: rgb(233, 30, 223);
+  position: relative;
+
+
+  font-family: 'InterExtraBold', sans-serif;
+
+  /* Fondo negro semi-transparente */
+  background: rgb(48, 51, 51);
+
+  /* Blur al fondo (efecto vidrio) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari */
+
+  /* Bordes redondeados y sombra */
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(255, 251, 252, 0.5);
+  z-index: 1; /* debajo de letras */
+}
+

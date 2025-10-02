@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Película</title>
+  <link rel="stylesheet" href="./style/style6.css">
+  <script type="module" src="./js/detallepelicula.js"></script>
+</head>
+<body>
+  <div class="conteiner1" id="detalle-pelicula">
+    <!-- Aquí se inyectarán el título, póster y descripción -->
+  </div>
+
+  <img src="./img/like.png" class="like">
+  <img src="./img/dislike.png" class="dislike">
+  
+  <h2>Califica:</h2>
+  <div class="rating">
+    <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+    <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+    <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+    <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+    <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+  </div>
+
+  <button class="btn"><pre class="ahora">Ver Ahora</pre></button>
+  <button class="btn2"><pre class="trailer">Ver trailer</pre></button>
+<div id="rating-promedio"></div>
+  <p class="reseñas">Reseñas</p>
+  <div id="form-reseña">
+  <h3>Escribe tu reseña</h3>
+  <input type="text" id="titulo-reseña" placeholder="Título" maxlength="60" required>
+  <textarea id="comentario-reseña" placeholder="Tu comentario..." rows="3" maxlength="300" required></textarea>
+  <button id="btn-agregar-reseña">Añadir reseña</button>
+</div>
+  <div id="lista-reseñas"></div>
+</body>
+</html>
