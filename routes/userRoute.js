@@ -58,18 +58,4 @@ router.put("/resenas/:id_pelicula/:id_usuario", CommentController.update);
 router.delete("/resenas/:id_usuario/:id_pelicula/:id_comentario", CommentController.deleteByMovie);
 router.get("/resenas/:id_pelicula/count", CommentController.countByMovie);
 
-
-
-
-
-router.get("/resenas/:id_pelicula", CommentController.viewByMovie);
-router.post('/SaveCSV', (req, res) => {
-
-  const csv = JSONToCSV(req.body, { fields: ["nombre usuario","calificacion","comentario","fecha" ]})
-
-  res.attachment('CustomerData.csv').send(csv)
-  
-})
-
-
 export default router;
