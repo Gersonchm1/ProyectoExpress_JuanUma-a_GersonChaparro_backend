@@ -502,3 +502,58 @@ export class UserModelRegister {
     return await this.collection.findOne({ _id: new ObjectId(userId) });
   }
 }
+
+
+// #################################################################################################
+
+//                                                Actividad
+                                      
+// #################################################################################################
+
+
+
+export class userModelActivity {
+    constructor() {
+    this.collection = null;
+  }
+
+  async init() {
+    const db = await connectDB();
+    this.collection = db.collection("usuario");
+    this.collection2 = db.collection("resena");
+
+  }
+
+
+ async viewActivityComments(userId) {
+  const session = client.startSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      user = await this.collection.findOne({ _id: new ObjectId(userId) });
+
+
+
+      history = await this.collection2.find({ id_usuario})
+
+    
+if (user === hystory){
+
+  history = user 
+
+  result =  await this.collection2.find({ comentario: history , fecha  },  { session }.toArray())
+
+
+}
+
+
+    });
+
+    return result;
+  } finally {
+    await session.endSession();
+  }
+}
+
+
+}
