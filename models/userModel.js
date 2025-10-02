@@ -105,6 +105,8 @@ export class UserModelComments {
   async init() {
     const db = await connectDB();
     this.collection = db.collection("resena");
+    this.collection2 = db.collection2("historial");
+
   }
 
   // Ver todos los comentarios
@@ -148,7 +150,7 @@ async addComment(data, movieId, userId) {
             const newComment = {
         ...data,
         id_pelicula: movieId, // referencia a la película
-        id_usuario: userId,   // referencia al usuario
+        id_usuario: ObjectId(userId),   // referencia al usuario
         fecha: new Date(),
       };
 
@@ -156,6 +158,7 @@ async addComment(data, movieId, userId) {
 
       // Insertar el comentario en la colección "comentario"
       result = await this.collection.insertOne(newComment, { session });
+      result = await this.collection2.insertOne( newComment, {session})
 
       // Actualiza el total de comentarios en la colección "pelicula"
       const db = await connectDB();
@@ -243,7 +246,24 @@ async UpdateComments(data, movieId, userId, commentId ) {
         // si el documento existe, lo actualiza, sino , lanza error
         { upsert: false, session }
       );
+    
+      result = await this.collection2.updateOne(
+        // busca que documento actualizar
+               {
+          id_usuario: userId,
+          id_pelicula: movieId,
+          id_comentario: commentId
+        },
+
+        // actualiza la informacion necesaria
+        { $set: reviewData },
+        // si el documento existe, lo actualiza, sino , lanza error
+        { upsert: false, session }
+      );
+    
+    
     });
+    
 
     return result;
   } finally {
@@ -261,6 +281,8 @@ export class UserModelRatings{
   async init() {
     const db = await connectDB();
     this.collection = db.collection("calificacion");
+    this.collection2 = db.collection("historial");
+
   }
 
   async addRating(data, movieId, userId) {
@@ -278,6 +300,9 @@ export class UserModelRatings{
   
         // Insertamos el rating en esta colección (this.collection = "rating")
         await this.collection.insertOne(newRating, { session });
+
+        await this.collection2.insertOne(newRating, { session });
+
   
         //  Actualizamos contador en películas
         result = await db.collection("pelicula").updateOne(
@@ -512,7 +537,7 @@ export class UserModelRegister {
 
 
 
-export class userModelActivity {
+export class UserModelActivity {
     constructor() {
     this.collection = null;
   }
@@ -520,7 +545,7 @@ export class userModelActivity {
   async init() {
     const db = await connectDB();
     this.collection = db.collection("usuario");
-    this.collection2 = db.collection("resena");
+    this.collection2 = db.collection("historial");
 
   }
 
@@ -541,7 +566,7 @@ if (user === hystory){
 
   history = user 
 
-  result =  await this.collection2.find({ comentario: history , fecha  },  { session }.toArray())
+  result =  await this.collection2.find({  id_usuario: user },  { session }.toArray())
 
 
 }

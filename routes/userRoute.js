@@ -4,7 +4,7 @@ import rateLimit from "express-rate-limit";
 import { checkRole } from "../middleware/checkrole.js";
 import { addVersion } from "../middleware/version.js"; 
 
-import { UserController, MovieController, CommentController, RatingController } from "../controllers/userController.js";
+import { UserController, MovieController, CommentController, RatingController, HistoryController} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -57,5 +57,11 @@ router.post("/resenas/:id_pelicula/:id_usuario", CommentController.add);
 router.put("/resenas/:id_pelicula/:id_usuario", CommentController.update);
 router.delete("/resenas/:id_usuario/:id_pelicula/:id_comentario", CommentController.deleteByMovie);
 router.get("/resenas/:id_pelicula/count", CommentController.countByMovie);
+
+
+// Rutas historial 
+
+
+router.get ("/activity/:id_usuario", HistoryController.viewAll)
 
 export default router;

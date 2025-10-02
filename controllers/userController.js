@@ -1,11 +1,11 @@
 import { client } from "../config/db.js";
-import {   UserModelRegister, UserModelMovie, UserModelComments,   UserModelRatings } from "../models/userModel.js";
+import {   UserModelRegister, UserModelMovie, UserModelComments,   UserModelRatings, UserModelActivity} from "../models/userModel.js";
 
 const userModel = new UserModelRegister();
 const movieModel = new UserModelMovie();
 const commentModel = new UserModelComments();
 const ratingModel = new UserModelRatings();
-
+const historyModel = new UserModelActivity();
 
 export class  UserController {
   // Registrar usuario
@@ -334,3 +334,46 @@ static async viewAll(req, res) {
     }
   }
 }
+
+
+
+//#################################################################################
+//                                        History
+//#################################################################################
+
+
+
+export class HistoryController {
+
+static async viewAll(req , res) {
+
+try{
+
+
+  const {id} = req.params
+
+
+  await historyModel.init()
+
+
+  const result = await historyModel.viewActivityComments(id)
+
+
+
+
+  return res.json({ msg: "Historial", result });
+
+
+}catch {
+
+
+
+}
+
+
+}
+
+
+}
+
+
