@@ -350,13 +350,13 @@ static async viewAll(req , res) {
 try{
 
 
-  const {id} = req.params
+  const {id_usuario} = req.params
 
 
   await historyModel.init()
 
 
-  const result = await historyModel.viewActivityComments(id)
+  const result = await historyModel.viewActivityComments(id_usuario)
 
 
 
@@ -364,12 +364,10 @@ try{
   return res.json({ msg: "Historial", result });
 
 
-}catch {
-
-
-
+} catch (err) {
+  console.error("Error en viewAll:", err);
+  return res.status(500).json({ error: "Error al obtener historial" });
 }
-
 
 }
 

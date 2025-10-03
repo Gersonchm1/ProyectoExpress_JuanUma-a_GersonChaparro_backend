@@ -100,12 +100,13 @@ async findMovieById(movieId) {
 export class UserModelComments {
   constructor() {
     this.collection = null;
+    this.collection2= null
   }
 
   async init() {
     const db = await connectDB();
     this.collection = db.collection("resena");
-    this.collection2 = db.collection2("historial");
+    this.collection2 = db.collection("historial");
 
   }
 
@@ -145,12 +146,13 @@ async addComment(data, movieId, userId) {
   const session = client.startSession();
   try {
     let result;
+    let result2
     await session.withTransaction(async () => {
 
             const newComment = {
         ...data,
         id_pelicula: movieId, // referencia a la película
-        id_usuario: ObjectId(userId),   // referencia al usuario
+        id_usuario: new ObjectId(userId),   // referencia al usuario
         fecha: new Date(),
       };
 
@@ -158,7 +160,7 @@ async addComment(data, movieId, userId) {
 
       // Insertar el comentario en la colección "comentario"
       result = await this.collection.insertOne(newComment, { session });
-      result = await this.collection2.insertOne( newComment, {session})
+      result2 = await this.collection2.insertOne( newComment, {session})
 
       // Actualiza el total de comentarios en la colección "pelicula"
       const db = await connectDB();
@@ -169,7 +171,8 @@ async addComment(data, movieId, userId) {
         { session }
       );
     });
-    return result;
+    return result, result2;
+  
   } catch (err) {
     console.error("Error en transacción:", err);
     throw err;
@@ -555,24 +558,21 @@ export class UserModelActivity {
   try {
     let result;
     await session.withTransaction(async () => {
-      user = await this.collection.findOne({ _id: new ObjectId(userId) });
+         const user = await this.collection.findOne(
+          { _id: new ObjectId(userId) },
+          { session }
+        );
 
 
+  if (!user) {
+          throw new Error("Usuario no encontrado");
+        }
 
-      history = await this.collection2.find({ id_usuario})
+        result = await this.collection2
+          .find({ id_usuario: userId }, { session }) 
+          .toArray();
+      });
 
-    
-if (user === hystory){
-
-  history = user 
-
-  result =  await this.collection2.find({  id_usuario: user },  { session }.toArray())
-
-
-}
-
-
-    });
 
     return result;
   } finally {
