@@ -213,7 +213,22 @@ async addComment(data, movieId, userId) {
         },
         { session }
       );
-    });
+    
+
+    result = await this.collection2.insertOne(
+      {
+        id_usuario: userId,       
+        id_pelicula: movieId,     
+        id_comentario: commentId  
+      },
+      { session }
+    );
+  });
+
+
+
+
+
     return result;
   } finally {
     await session.endSession();
@@ -225,6 +240,7 @@ async UpdateComments(data, movieId, userId, commentId ) {
   const session = client.startSession();
   try {
     let result;
+    let result2;
     await session.withTransaction(async () => {
       // Se ponen los datos a actualizar
        const reviewData = {
@@ -250,7 +266,7 @@ async UpdateComments(data, movieId, userId, commentId ) {
         { upsert: false, session }
       );
     
-      result = await this.collection2.updateOne(
+      result2 = await this.collection2.insertOne(
         // busca que documento actualizar
                {
           id_usuario: userId,
@@ -260,15 +276,15 @@ async UpdateComments(data, movieId, userId, commentId ) {
 
         // actualiza la informacion necesaria
         { $set: reviewData },
-        // si el documento existe, lo actualiza, sino , lanza error
-        { upsert: false, session }
+        // si el documento existe, lo actualiza, sino , lo crea 
+        { upsert: true, session }
       );
     
     
     });
     
 
-    return result;
+    return result, result2;
   } finally {
     await session.endSession();
   }
@@ -309,6 +325,12 @@ export class UserModelRatings{
   
         //  Actualizamos contador en películas
         result = await db.collection("pelicula").updateOne(
+          { _id: movieId },                 // 🔹 si _id es string, lo dejas así
+          { $inc: { totalratings: 1 } },    // 🔹 suma 1 al contador
+          { session }
+        );
+
+        result = await db.collection("historial").updateOne(
           { _id: movieId },                 // 🔹 si _id es string, lo dejas así
           { $inc: { totalratings: 1 } },    // 🔹 suma 1 al contador
           { session }
